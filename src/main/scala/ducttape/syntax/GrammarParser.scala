@@ -10,16 +10,16 @@ import scala.util.parsing.input.CharArrayReader
 import scala.util.parsing.input.Position
 import scala.util.parsing.input.Positional
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 import ducttape.util.IO
 
 object GrammarParser extends RegexParsers {
 
   override val skipWhitespace = false;
 
-  private def addFileInfo(element: ASTType, file: File) {
+  private def addFileInfo(element: Node, file: File) {
     // don't steamroll filenames from import statements!
-    if (element.declaringFile == ASTType.UnknownFile) {
+    if (element.declaringFile == Node.UnknownFile) {
       element.declaringFile = file
     }
     element.children.foreach(addFileInfo(_, file))
@@ -27,11 +27,11 @@ object GrammarParser extends RegexParsers {
 
   def readWorkflow(file: File, isImported: Boolean = false): WorkflowDefinition = {
     val importDir: File = file.getAbsoluteFile.getParentFile
-    val result: ParseResult[Seq[ASTType]] = parseAll(Grammar.elements(importDir), IO.read(file, "UTF-8"))
+    val result: ParseResult[Seq[Node]] = parseAll(Grammar.elements(importDir), IO.read(file, "UTF-8"))
     val pos = result.next.pos
 
     return result match {
-      case Success(elements: Seq[ASTType], _) => {
+      case Success(elements: Seq[Node], _) => {
         elements.foreach(addFileInfo(_, file))
         new WorkflowDefinition(elements, Seq(file), isImported).collapseImports.collapseFunctionCallTasks()
       }

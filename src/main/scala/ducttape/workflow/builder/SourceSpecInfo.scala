@@ -2,8 +2,8 @@
 
 package ducttape.workflow.builder
 
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.TaskDef
 import ducttape.workflow.Branch
 
 private[builder] class SourceSpecInfo(

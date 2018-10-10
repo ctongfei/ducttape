@@ -3,17 +3,17 @@
 package ducttape.workflow.builder
 
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.BranchGraft
-import ducttape.syntax.AbstractSyntaxTree.BranchGraftElement
-import ducttape.syntax.AbstractSyntaxTree.BranchPointDef
-import ducttape.syntax.AbstractSyntaxTree.ConfigVariable
-import ducttape.syntax.AbstractSyntaxTree.Literal
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.SequentialBranchPoint
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.TaskVariable
-import ducttape.syntax.AbstractSyntaxTree.Unbound
+import ducttape.syntax.AST.BranchGraft
+import ducttape.syntax.AST.BranchGraftElement
+import ducttape.syntax.AST.BranchPointDef
+import ducttape.syntax.AST.ConfigVariable
+import ducttape.syntax.AST.Literal
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.SequentialBranchPoint
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.TaskVariable
+import ducttape.syntax.AST.Unbound
 import ducttape.syntax.FileFormatException
 import ducttape.workflow.Branch
 import ducttape.workflow.BranchFactory
@@ -69,7 +69,7 @@ object VariableHandler extends Logging {
                                   grafts: Seq[Branch] = Nil)(implicit taskTemplateBuilder: TaskTemplateBuilder)
                                  : Seq[SourceSpecInfo] = {                                  
 //                                 : (Spec, Option[TaskDef], Seq[Branch]) = {
-    curSpec.rval match {
+    curSpec.rValue match {
       // we might have traced back through a TaskVariable into a parent's parameters,
       // which can, in turn, define a branch point
       // just return what we have and let resolveBranchPoint figure out the rest

@@ -8,18 +8,18 @@ import ducttape.hyperdag.HyperEdge
 import ducttape.workflow.SpecTypes._
 import ducttape.workflow.Types.UnpackedWorkVert
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.ConfigVariable
-import ducttape.syntax.AbstractSyntaxTree.BranchPointDef
-import ducttape.syntax.AbstractSyntaxTree.SequentialBranchPoint
-import ducttape.syntax.AbstractSyntaxTree.ConfigAssignment
-import ducttape.syntax.AbstractSyntaxTree.BranchGraft
-import ducttape.syntax.AbstractSyntaxTree.Literal
-import ducttape.syntax.AbstractSyntaxTree.Unbound
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.ConfigVariable
+import ducttape.syntax.AST.BranchPointDef
+import ducttape.syntax.AST.SequentialBranchPoint
+import ducttape.syntax.AST.ConfigAssignment
+import ducttape.syntax.AST.BranchGraft
+import ducttape.syntax.AST.Literal
+import ducttape.syntax.AST.Unbound
 import ducttape.syntax.FileFormatException
-import ducttape.syntax.AbstractSyntaxTree.TaskVariable
+import ducttape.syntax.AST.TaskVariable
 
 import grizzled.slf4j.Logging
 

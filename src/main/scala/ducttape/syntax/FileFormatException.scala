@@ -4,7 +4,7 @@ package ducttape.syntax
 
 import java.io.File
 import scala.util.parsing.input.Position
-import ducttape.syntax.AbstractSyntaxTree.ASTType
+import ducttape.syntax.AST.Node
 import scala.collection.LinearSeq
 
 /**
@@ -24,9 +24,9 @@ class FileFormatException(val msg: String, val refs: Seq[(File, Int, Int, Int)])
 
   // require LinearSeq instead of Seq to get around erasure
   // Note: For ASTTypes, we use endPos to capture the last line that a long block might cover (e.g. TaskHeaders)
-  def this(msg: String, refs: List[ASTType]) = this(msg, for(t <- refs) yield (t.declaringFile, t.pos.line, t.pos.column, t.endPos.line))
+  def this(msg: String, refs: List[Node]) = this(msg, for(t <- refs) yield (t.declaringFile, t.pos.line, t.pos.column, t.endPos.line))
 
-  def this(msg: String, ref: ASTType) = this(msg, List(ref))
+  def this(msg: String, ref: Node) = this(msg, List(ref))
 }
 
 object FileFormatException {

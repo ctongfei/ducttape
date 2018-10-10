@@ -6,8 +6,8 @@ import ducttape.util.BashException
 import ducttape.util.Shell
 import ducttape.util.Files
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.PackageDef
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
+import ducttape.syntax.AST.PackageDef
+import ducttape.syntax.AST.LiteralSpec
 
 import grizzled.slf4j.Logging
 
@@ -46,7 +46,7 @@ class PackageBuilder(dirs: DirectoryArchitect,
       val buildCmds = Seq(myPackage.commands.toString)
       // package params have already been checked to be literal
       val env: Seq[(String, String)] = myPackage.params.filter(!_.dotVariable).map(_.asInstanceOf[LiteralSpec]).map {
-        spec => (spec.name, spec.rval.value)
+        spec => (spec.name, spec.rValue.value)
       } 
       val stdPrefix = "build " + packageName
       val exitCode = Shell.run(buildCmds, stdPrefix, buildEnv.buildDir, env,

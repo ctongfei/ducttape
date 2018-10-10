@@ -3,7 +3,7 @@
 package ducttape.workflow
 
 import collection._
-import ducttape.syntax.AbstractSyntaxTree.Spec
+import ducttape.syntax.AST.Spec
 import ducttape.util.MultiSet
 import ducttape.hyperdag.PackedVertex
 import ducttape.hyperdag.meta.UnpackedMetaVertex

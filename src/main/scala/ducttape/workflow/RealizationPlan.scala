@@ -3,7 +3,7 @@
 package ducttape.workflow
 
 import collection._
-import ducttape.syntax.AbstractSyntaxTree.PlanDefinition
+import ducttape.syntax.AST.PlanDefinition
 
 // TODO: Move filter here, but thoroughly describe the context
 // in which it executes

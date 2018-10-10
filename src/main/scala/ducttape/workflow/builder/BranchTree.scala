@@ -2,7 +2,7 @@
 
 package ducttape.workflow.builder
 
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.TaskDef
 import ducttape.workflow.Branch
 import ducttape.workflow.BranchPoint
 import scala.collection.mutable

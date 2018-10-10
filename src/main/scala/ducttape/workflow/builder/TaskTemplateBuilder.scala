@@ -3,10 +3,10 @@
 package ducttape.workflow.builder
 
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.WorkflowDefinition
 import ducttape.workflow.BranchFactory
 import ducttape.workflow.BranchPoint
 import ducttape.workflow.BranchPointFactory

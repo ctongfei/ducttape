@@ -3,7 +3,7 @@
 package ducttape.cli
 // TODO: Move out of CLI
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 import ducttape.syntax.FileFormatException
 import ducttape.util.Booleans
 
@@ -12,7 +12,7 @@ class Directives(confSpecs: Seq[ConfigAssignment]) {
   // TODO: Move conf specs method into WorkflowDefinition?
   def getLiteralSpec(name: String): Option[LiteralSpec] = {
     confSpecs.map(_.spec).find { spec => spec.name == name } match {
-      case Some(spec) => spec.rval match {
+      case Some(spec) => spec.rValue match {
         // silly typesystem doesn't detect that this is trivially true...
         case lit: Literal => Some(spec.asInstanceOf[LiteralSpec])
         case _ => throw new FileFormatException("%s directive must be a literal".format(name), spec)
@@ -20,11 +20,11 @@ class Directives(confSpecs: Seq[ConfigAssignment]) {
       case None => None
     }
   }
-  def getLiteralSpecValue(name: String): Option[String] = getLiteralSpec(name).map(_.rval.value)
+  def getLiteralSpecValue(name: String): Option[String] = getLiteralSpec(name).map(_.rValue.value)
   
   val flat: Boolean = {
     getLiteralSpec("ducttape_structure") match {
-      case Some(literalSpec) => literalSpec.rval.value.toLowerCase match {
+      case Some(literalSpec) => literalSpec.rValue.value.toLowerCase match {
         case "flat" => true
         case "hyper" => false
         case _ => throw new FileFormatException("ducttape_structure directive must be either 'flat' or 'hyper'", literalSpec)

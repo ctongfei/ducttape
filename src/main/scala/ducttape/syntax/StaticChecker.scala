@@ -3,7 +3,7 @@
 package ducttape.syntax
 
 import collection._
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 import annotation.tailrec
 
 object ErrorBehavior extends Enumeration {
@@ -34,7 +34,7 @@ class StaticChecker(undeclaredBehavior: ErrorBehavior,
     val errors = new mutable.ArrayBuffer[FileFormatException]
 
     // make sure that branch points are coherent throughout the workflow
-    def findBranchPoints(node: ASTType): Seq[BranchPointDef] = {
+    def findBranchPoints(node: Node): Seq[BranchPointDef] = {
       val myBranchPoints: Seq[BranchPointDef] = node match {
         case bp: BranchPointDef => Seq(bp)
         case _ => Nil
@@ -141,7 +141,7 @@ class StaticChecker(undeclaredBehavior: ErrorBehavior,
     val errors = new mutable.ArrayBuffer[FileFormatException]
 
     // first check for things not allowed in ducttape
-    for (spec <- taskDef.inputs) spec.rval match {
+    for (spec <- taskDef.inputs) spec.rValue match {
       case Literal(path) => {
         if (path == "") {
           errors += new FileFormatException("Empty input name not allowed", spec)
@@ -149,7 +149,7 @@ class StaticChecker(undeclaredBehavior: ErrorBehavior,
       }
       case _ => ;
     }
-    for (spec <- taskDef.outputs) spec.rval match {
+    for (spec <- taskDef.outputs) spec.rValue match {
       case Literal(path) => {
         if (path == "") {
           errors += new FileFormatException("Empty output name not allowed", spec)

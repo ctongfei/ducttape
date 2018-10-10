@@ -2,7 +2,7 @@
 
 package ducttape.util
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 import ducttape.syntax.GrammarParser._
 import org.scalatest.Assertions
 import scala.util.parsing.combinator.Parsers

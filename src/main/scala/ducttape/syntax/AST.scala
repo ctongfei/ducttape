@@ -9,15 +9,11 @@ import scala.collection.immutable.NumericRange.Inclusive
 
 import ducttape.util.Anonymous
 
-object AbstractSyntaxTree {
-
-  object ASTType {
-    val UnknownFile = new File("unknown_file")
-  }
+object AST {
 
   /** Parent class of all types representing elements in an abstract syntax tree. */
-  sealed trait ASTType extends Positional {
-    private var _file = ASTType.UnknownFile
+  sealed trait Node extends Positional {
+    private var _file = Node.UnknownFile
     def declaringFile_=(f: File) { _file = f }
     def declaringFile: File = _file
 
@@ -25,75 +21,75 @@ object AbstractSyntaxTree {
     def endPos: Position = pos
 
     // used for traversing AST... abstractly
-    def children: Seq[ASTType]
+    def children: Seq[Node]
+  }
+  object Node {
+    val UnknownFile = new File("unknown_file")
   }
 
-  case class Comments(val value: Option[String]) extends ASTType {
+
+  case class Comments(value: Option[String]) extends Node {
     override def children = Nil
-    override def toString() = value match {
-      case Some(s:String) => s
-      case None           => ""
-    }
+    override def toString = value.getOrElse("")
   }
 
   /** Type of the right hand side in an assignment. */
-  sealed trait RValue extends ASTType;
+  sealed trait RValue extends Node
 
-  /** Unbound is the right hand side type in an underspecified variable declaration.
-   *
-   *  Conceptually, Unbound can be thought of as the None case if one were to define Option[+RValue].
+  /**
+   * Unbound is the right hand side type in an underspecified variable declaration.
+   * Conceptually, Unbound can be thought of as the None case if one were to define Option[+RValue].
    */
   case class Unbound() extends RValue {
     override def children = Nil
-    override def toString() = ""
+    override def toString = ""
   }
 
   /** Type of a literal string value, in the right-hand side context of an assignment. */
-  case class Literal(val value: String) extends RValue {
+  case class Literal(value: String) extends RValue {
     override def children = Nil
-    override def toString() = "'%s'".format(value)
+    override def toString = s"'$value'"
   }
 
   /** Type of a variable reference, in the right-hand side context of an assignment. */
-  case class ConfigVariable(val value: String) extends RValue {
+  case class ConfigVariable(value: String) extends RValue {
     override def children = Nil
-    override def toString() = "$%s".format(value)
+    override def toString = s"$$$value"
   }
 
   /** Type of a variable reference attached to a specific task,
    * in the right-hand side context of an assignment. */
-  case class TaskVariable(val taskName: String, val value: String) extends RValue {
+  case class TaskVariable(taskName: String, value: String) extends RValue {
     override def children = Nil
-    override def toString() = "$%s@%s".format(value,taskName)
+    override def toString = s"$$$value@$taskName"
   }
 
   /** Type of a shorthand variable reference attached to a specific task,
    * in the right-hand side context of an assignment. */
-  case class ShorthandTaskVariable(val taskName: String) extends RValue {
+  case class ShorthandTaskVariable(taskName: String) extends RValue {
     override def children = Nil
-    override def toString() = "@%s".format(taskName)
+    override def toString = s"@$taskName"
   }
 
   /** Type of a shorthand global or config variable reference,
    * in the right-hand side context of an assignment. */
   case class ShorthandConfigVariable() extends RValue {
     override def children = Nil
-    override def toString() = "@"
+    override def toString = "@"
   }
 
-  case class Sequence(val start: BigDecimal,
-                      val end: BigDecimal,
-                      val increment: BigDecimal) extends ASTType {
-    override lazy val children = {
-      this.toSeq.map({ number:BigDecimal => {
-        val string = number.toString()
-        new BranchSpec(string, new Literal(string))
-      }})
-    }
+  case class Sequence(start: BigDecimal,
+                      end: BigDecimal,
+                      increment: BigDecimal) extends Node {
+    override lazy val children =
+      seq.map { number =>
+        val string = number.toString
+        BranchSpec(string, Literal(string))
+      }
 
-    override def toString() = "%s..%s..%s".format(start,end,increment)
+    override def toString = s"$start..$end..$increment"
 
-    private lazy val toSeq : Seq[BigDecimal] = {
+    private lazy val seq: Seq[BigDecimal] =
       new scala.collection.mutable.ArrayBuffer[BigDecimal] {
         var currentValue = start
         while (currentValue <= end) {
@@ -101,30 +97,24 @@ object AbstractSyntaxTree {
           currentValue += increment
         }
       }
-    }.toSeq
+
   }
 
   /**
    * Type of a branch point that defines a sequence,
    * in the right-hand side context of an assignment.
    */
-  case class SequentialBranchPoint(val branchPointName: Option[String],
-                                   val sequence: Sequence) extends RValue {
+  case class SequentialBranchPoint(branchPointName: Option[String], sequence: Sequence) extends RValue {
     override def children = Seq(sequence)
-    override def toString() = {
-        branchPointName match {
-          case Some(s) => "(%s: %s)".format(s,sequence)
-          case None    => "(%s)".format(sequence)
-        }
-    }
+    override def toString = branchPointName.fold(s"($sequence)")(s => s"($s: $sequence)")
   }
 
   object SequentialBranchPoint {
 
-    private val map = new java.util.IdentityHashMap[SequentialBranchPoint,String]
+    private val map = new java.util.IdentityHashMap[SequentialBranchPoint, String]
 
-    def getName(branchPointDef:SequentialBranchPoint) : String = {
-      return branchPointDef.branchPointName match {
+    def getName(branchPointDef: SequentialBranchPoint): String = {
+      branchPointDef.branchPointName match {
         case Some(name) => name
         case None       => {
           if (map.containsKey(branchPointDef)) {
@@ -141,11 +131,12 @@ object AbstractSyntaxTree {
   }
 
   /** Pair containing a branch point name and a branch name. */
-  case class BranchGraftElement(val branchPointName: String,
-                           val branchName: String) extends ASTType {
+  case class BranchGraftElement(branchPointName: String, branchName: String) extends Node {
     override def children = Nil
-    override def toString() = "%s:%s".format(branchPointName,branchName)
-    lazy val isGlob = branchName=="*"
+    override def toString = s"$branchPointName:$branchName"
+    
+    lazy val isGlob = 
+      branchName == "*"
   }
 
   /** Type of a branch graft, in the right-hand side context of an assignment. */
@@ -179,85 +170,86 @@ object AbstractSyntaxTree {
   /**
    * Abstract specification of a variable name and its right hand side.
    */
-  abstract sealed class AbstractSpec[+A <: RValue] extends ASTType {
+  abstract sealed class AbstractSpec[+A <: RValue] extends Node {
     val name: String
-    val rval: A
+    val rValue: A
     val dotVariable: Boolean
-    override def children = Seq(rval)
-    override def hashCode() = name.hashCode()
-    override def equals(that: Any) = that match { case other: AbstractSpec[_] => (other.name == this.name) }
-    override def toString() = {
+    override def children = Seq(rValue)
+    
+    override def hashCode = name.hashCode()
+    override def equals(that: Any) = that match { 
+      case other: AbstractSpec[_] => other.name == this.name
+      case _ => false
+    }
+    override def toString = {
       val displayName = if (dotVariable) "." + name else name
-      "%s=%s".format(displayName, rval)
+      s"$displayName=$rValue"
     }
   }
+  
   type Spec = AbstractSpec[RValue]
+  
   type LiteralSpec = AbstractSpec[Literal]
 
-  case class ConfigParamSpec[+A <: RValue](val name:String, val rval:A, val dotVariable:Boolean) extends AbstractSpec[A] //{System.out.println("ConfigParamSpec=" + name)}
+  case class ConfigParamSpec[+A <: RValue](name: String, rValue: A, dotVariable: Boolean) extends AbstractSpec[A] //{System.out.println("ConfigParamSpec=" + name)}
 
-  case class TaskParamSpec[+A <: RValue](val name:String, val rval:A, val dotVariable:Boolean) extends AbstractSpec[A] //{System.out.println("TaskParamSpec=" + name)}
+  case class TaskParamSpec[+A <: RValue](name: String, rValue:A, dotVariable: Boolean) extends AbstractSpec[A] //{System.out.println("TaskParamSpec=" + name)}
 
-  case class TaskInputSpec[+A <: RValue](val name:String, val rval:A) extends AbstractSpec[A] {
-    val dotVariable:Boolean = false
+  case class TaskInputSpec[+A <: RValue](name: String, rValue: A) extends AbstractSpec[A] {
+    val dotVariable: Boolean = false
   }
 
-  case class TaskOutputSpec[+A <: RValue](val name:String, val rval:A) extends AbstractSpec[A] {
-    val dotVariable:Boolean = false
+  case class TaskOutputSpec[+A <: RValue](name: String, rValue: A) extends AbstractSpec[A] {
+    val dotVariable: Boolean = false
   }
 
-  case class PackageSpec(val name:String) extends AbstractSpec[Unbound] {
-    val rval = Unbound()
-    val dotVariable:Boolean = false
+  case class PackageSpec(name: String) extends AbstractSpec[Unbound] {
+    val rValue = Unbound()
+    val dotVariable: Boolean = false
   }
 
-  case class BranchSpec[+A <: RValue](val name:String, val rval:A) extends AbstractSpec[A] {
-    val dotVariable:Boolean = false
+  case class BranchSpec[+A <: RValue](name: String, rValue: A) extends AbstractSpec[A] {
+    val dotVariable: Boolean = false
   }
 
 
   /**
    * A key=value assignment defined in a "config" definition or config file.
    */
-  case class ConfigAssignment(val spec: Spec, val comments: Comments) extends ASTType {
+  case class ConfigAssignment(spec: Spec, comments: Comments) extends Node {
     override def children = Seq(spec, comments)
-    override def toString() = spec.toString()
+    override def toString = spec.toString
   }
 
-  sealed trait Specs extends ASTType {
+  sealed trait Specs extends Node {
     val specs: Seq[Spec]
     val comments: Comments
   }
 
-  case class TaskInputs(val specs: Seq[Spec], val comments: Comments) extends Specs {
-    override def children = specs ++ Seq(comments)
+  case class TaskInputs(specs: Seq[Spec], comments: Comments) extends Specs {
+    override def children = specs :+ comments
   }
-  case class TaskOutputs(val specs: Seq[Spec], val comments: Comments) extends Specs {
-    override def children = specs ++ Seq(comments)
+  case class TaskOutputs(specs: Seq[Spec], comments: Comments) extends Specs {
+    override def children = specs :+ comments
   }
-  case class TaskParams(val specs: Seq[Spec], val comments: Comments) extends Specs {
-    override def children = specs ++ Seq(comments)
+  case class TaskParams(specs: Seq[Spec], comments: Comments) extends Specs {
+    override def children = specs :+ comments
   }
-  case class TaskPackageNames(val specs: Seq[Spec], val comments: Comments) extends Specs {
-    override def children = specs ++ Seq(comments)
+  case class TaskPackageNames(specs: Seq[Spec], comments: Comments) extends Specs {
+    override def children = specs :+comments
   }
 
  /** Branch in a hyperworkflow, defined in the right hand side of a variable declaration. */
-  case class BranchPointDef(val name: Option[String], val specs: Seq[Spec]) extends RValue {
+  case class BranchPointDef(name: Option[String], specs: Seq[Spec]) extends RValue {
     override def children = specs
-    override def toString() = {
-      name match {
-        case Some(s) => "(%s: %s)".format(s, specs.mkString(" "))
-        case None    => "(%s)".format(specs.mkString(" "))
-      }
-    }
+    override def toString = s"(${name.fold("")(n => s"$n: ")}${specs.mkString(" ")})"
   }
 
   object BranchPointDef {
 
     private val map = new java.util.IdentityHashMap[BranchPointDef,String]
 
-    def getName(branchPointDef:BranchPointDef) : String = {
+    def getName(branchPointDef: BranchPointDef): String = {
       return branchPointDef.name match {
         case Some(name) => name
         case None       => {
@@ -275,15 +267,13 @@ object AbstractSyntaxTree {
   }
 
  /** Reference, in a plan, to a branchpoint and one or more of its branches. */
-  case class BranchPointRef(val name: String, val branchNames: Seq[ASTType]) extends ASTType {
+  case class BranchPointRef(name: String, branchNames: Seq[Node]) extends Node {
     override def children = Nil
-    override def toString() = {
-      "(%s: %s)".format(name, branchNames.mkString(" "))
-    }
+    override def toString = s"$name: ${branchNames.mkString(" ")}"
   }
 
   // TODO: Pass a StringBuilder down through the AST to make stringification faster
-  case class BashCode(val code: String, val vars: Set[String] = Set.empty) extends ASTType {
+  case class BashCode(code: String, vars: Set[String] = Set.empty) extends Node {
     override def children = Nil // TODO: Name exactly what line vars come from
     override def toString = code
   }
@@ -292,13 +282,13 @@ object AbstractSyntaxTree {
 //    override def toString = comments.toString() + "\n" + List(packageNames).mkString(" ")
 //  }
 
-  case class TaskHeader(val specsList: List[Specs]) extends ASTType {
+  case class TaskHeader(specsList: List[Specs]) extends Node {
     override def children = specsList
-    override def toString() = specsList.mkString(" ")
+    override def toString = specsList.mkString(" ")
   }
 
   /** Defines a block of ducttape code, such as a task definition. */
-  sealed trait Block extends ASTType {
+  sealed trait Block extends Node {
     val comments: Comments
   }
 
@@ -307,34 +297,32 @@ object AbstractSyntaxTree {
    *
    * @param keyword The keyword used to declare this block.
    */
-  abstract sealed case class TaskLike(val comments: Comments,
-                val keyword: String,
-                val name: Namespace, // TODO: Rename name to namespace to prevent namespace == name confusion
-                val header: TaskHeader,
-                val commands: BashCode) extends Block {
+  abstract sealed case class TaskLike(
+    comments: Comments,
+    keyword: String,
+    name: Namespace, // TODO: Rename name to namespace to prevent namespace == name confusion
+    header: TaskHeader,
+    commands: BashCode
+  ) extends Block {
 
     override def children = Seq(comments, header, commands)
 
-    private def packageSpecList: Seq[TaskPackageNames] = header.specsList.collect{ case x: TaskPackageNames => x }
-    private def inputSpecList: Seq[TaskInputs] = header.specsList.collect{ case x: TaskInputs => x }
-    private def outputSpecList: Seq[TaskOutputs] = header.specsList.collect{ case x: TaskOutputs => x }
-    private def paramSpecList: Seq[TaskParams] = header.specsList.collect{ case x: TaskParams => x }
+    private def packageSpecList: Seq[TaskPackageNames] = header.specsList.collect { case x: TaskPackageNames => x }
+    private def inputSpecList: Seq[TaskInputs] = header.specsList.collect { case x: TaskInputs => x }
+    private def outputSpecList: Seq[TaskOutputs] = header.specsList.collect { case x: TaskOutputs => x }
+    private def paramSpecList: Seq[TaskParams] = header.specsList.collect { case x: TaskParams => x }
 
     // a few convenience methods:
     lazy val packages: Seq[Spec] = packageSpecList.flatMap(_.specs)
     lazy val inputs: Seq[Spec] = inputSpecList.flatMap(_.specs)
     lazy val outputs: Seq[Spec] = outputSpecList.flatMap(_.specs)
     lazy val params: Seq[Spec] = paramSpecList.flatMap(_.specs)
-    lazy val allSpecs: Seq[Spec] = header.specsList.flatMap { specs: Specs => specs.specs }
+    lazy val allSpecs: Seq[Spec] = header.specsList.flatMap(_.specs)
 
     override lazy val endPos: Position = {
       // TODO: Define ordering on positional so that we can find last column, too
-      if (allSpecs.size == 0) {
-        header.pos
-      } else {
-        val lastSpec: Spec = allSpecs.maxBy[Int] { spec: Spec => spec.pos.line }
-        lastSpec.pos
-      }
+      if (allSpecs.isEmpty) header.pos
+      else allSpecs.maxBy{ _.pos.line }.pos
     }
 
     override def hashCode() = name.hashCode()
@@ -427,7 +415,7 @@ object AbstractSyntaxTree {
   }
 
 
-  case class CrossProduct(val goals: Seq[String], val value: Seq[BranchPointRef]) extends ASTType {
+  case class CrossProduct(val goals: Seq[String], val value: Seq[BranchPointRef]) extends Node {
     override def children = value
     override def toString() = {
       "reach %s via %s".format(goals.mkString(","),value.mkString(" * "))
@@ -455,10 +443,10 @@ object AbstractSyntaxTree {
   }
 
   /** Ducttape hyperworkflow file. */
-  case class WorkflowDefinition(val elements: Seq[ASTType],
-                           val files: Seq[File], // what files is this workflow definition composed of?
-                           private val hadImports: Boolean = false,
-                           private val isImported: Boolean = false) extends ASTType {
+  case class WorkflowDefinition(val elements: Seq[Node],
+                                val files: Seq[File], // what files is this workflow definition composed of?
+                                private val hadImports: Boolean = false,
+                                private val isImported: Boolean = false) extends Node {
     override def children = elements
 
     lazy val blocks: Seq[Block] = elements.collect { case x: Block => x }

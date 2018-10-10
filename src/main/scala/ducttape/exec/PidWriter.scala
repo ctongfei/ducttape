@@ -4,7 +4,7 @@ package ducttape.exec
 
 import java.io.File
 import collection._
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 import ducttape.workflow.Branch
 import ducttape.workflow.Realization
 import ducttape.workflow.VersionedTask

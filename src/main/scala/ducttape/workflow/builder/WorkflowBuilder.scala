@@ -5,29 +5,29 @@ package ducttape.workflow.builder
 import ducttape.hyperdag.meta.PhantomMetaHyperDagBuilder
 import ducttape.hyperdag.PackedVertex
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.ASTType
-import ducttape.syntax.AbstractSyntaxTree.BranchGraft
-import ducttape.syntax.AbstractSyntaxTree.BranchPointDef
-import ducttape.syntax.AbstractSyntaxTree.BranchPointRef
-import ducttape.syntax.AbstractSyntaxTree.Comments
-import ducttape.syntax.AbstractSyntaxTree.ConfigAssignment
-import ducttape.syntax.AbstractSyntaxTree.ConfigVariable
-import ducttape.syntax.AbstractSyntaxTree.CrossProduct
-import ducttape.syntax.AbstractSyntaxTree.Literal
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.PlanDefinition
-import ducttape.syntax.AbstractSyntaxTree.Sequence
-import ducttape.syntax.AbstractSyntaxTree.SequentialBranchPoint
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.SubmitterDef
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.TaskHeader
-import ducttape.syntax.AbstractSyntaxTree.TaskVariable
-import ducttape.syntax.AbstractSyntaxTree.Unbound
-import ducttape.syntax.AbstractSyntaxTree.VersionerDef
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
+import ducttape.syntax.AST.Node
+import ducttape.syntax.AST.BranchGraft
+import ducttape.syntax.AST.BranchPointDef
+import ducttape.syntax.AST.BranchPointRef
+import ducttape.syntax.AST.Comments
+import ducttape.syntax.AST.ConfigAssignment
+import ducttape.syntax.AST.ConfigVariable
+import ducttape.syntax.AST.CrossProduct
+import ducttape.syntax.AST.Literal
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.PlanDefinition
+import ducttape.syntax.AST.Sequence
+import ducttape.syntax.AST.SequentialBranchPoint
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.SubmitterDef
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.TaskHeader
+import ducttape.syntax.AST.TaskVariable
+import ducttape.syntax.AST.Unbound
+import ducttape.syntax.AST.VersionerDef
+import ducttape.syntax.AST.WorkflowDefinition
 import ducttape.syntax.AbstractSyntaxTreeException
-import ducttape.syntax.AbstractSyntaxTree.BashCode
+import ducttape.syntax.AST.BashCode
 import ducttape.syntax.FileFormatException
 import ducttape.workflow.Branch
 import ducttape.workflow.BranchFactory
@@ -89,7 +89,7 @@ class WorkflowBuilder(wd: WorkflowDefinition, configSpecs: Seq[ConfigAssignment]
           catcher {
             val branchPoint: BranchPoint = branchPointFactory(ref.name)
             // TODO: Change branches back to Branch after we get the baseline/branch name duality hammered out?
-            val branches: Set[String] = ref.branchNames.flatMap { element: ASTType =>
+            val branches: Set[String] = ref.branchNames.flatMap { element: Node =>
               element match {
                 case l: Literal => Seq(l.value.toString)
                 case s: Sequence => {
@@ -97,7 +97,7 @@ class WorkflowBuilder(wd: WorkflowDefinition, configSpecs: Seq[ConfigAssignment]
                     x.toString
                   }
                 }
-                case e: ASTType => throw new AbstractSyntaxTreeException(e, "Element cannot be used to refer to a branch name")
+                case e: Node => throw new AbstractSyntaxTreeException(e, "Element cannot be used to refer to a branch name")
               }
             }.toSet
             (branchPoint, branches) // map entry
@@ -238,7 +238,7 @@ class WorkflowBuilder(wd: WorkflowDefinition, configSpecs: Seq[ConfigAssignment]
 
     // first identify all branch points that are present in the workflow so that
     // we can identify and store which elements are branch points
-    def findBranchPoints(element: ASTType) {
+    def findBranchPoints(element: Node) {
       element match {
         case BranchPointDef(nameOpt: Option[String], branchSpecs: Seq[Spec]) => {
           nameOpt match {

@@ -47,8 +47,8 @@ class TaskEnvironment(val dirs: DirectoryArchitect,
     
     for (paramVal <- task.paramVals) {
       debug(s"For paramSpec ${paramVal.origSpec} with srcSpec ${paramVal.srcSpec}, got value: " +
-            s"${paramVal.srcSpec.rval.value}")            
-      map.addValue(paramVal.origSpec.name, paramVal.srcSpec.rval.value)
+            s"${paramVal.srcSpec.rValue.value}")
+      map.addValue(paramVal.origSpec.name, paramVal.srcSpec.rValue.value)
     }
     
     map.toStringTupleSeq

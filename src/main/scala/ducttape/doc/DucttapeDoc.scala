@@ -10,8 +10,8 @@ import collection._
 import System._
 import ducttape.util.Files
 import ducttape.syntax.GrammarParser
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.TaskDef
 import org.pegdown.ast.RootNode
 import org.pegdown.ast.Visitor
 

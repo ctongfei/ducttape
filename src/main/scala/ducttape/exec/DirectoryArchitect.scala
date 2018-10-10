@@ -5,13 +5,13 @@ package ducttape.exec
 import java.io.File
 import ducttape.workflow.Realization
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.BranchPointDef
-import ducttape.syntax.AbstractSyntaxTree.Unbound
-import ducttape.syntax.AbstractSyntaxTree.Literal
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.ConfigVariable
-import ducttape.syntax.AbstractSyntaxTree.Spec
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.BranchPointDef
+import ducttape.syntax.AST.Unbound
+import ducttape.syntax.AST.Literal
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.ConfigVariable
+import ducttape.syntax.AST.Spec
 import ducttape.syntax.FileFormatException
 import ducttape.util.Environment
 import ducttape.util.Files
@@ -118,7 +118,7 @@ class DirectoryArchitect(val flat: Boolean,
   def assignOutFile(spec: Spec, taskDef: TaskDef, realization: Realization, taskVersion: Int): File = {
     debug(s"Assigning outfile for ${spec}")
     val taskDir = assignDir(taskDef, realization, taskVersion)
-    spec.rval match {
+    spec.rValue match {
       case Unbound() => { // user didn't specify a name for this output file
         new File(taskDir, spec.name) // will never collide with stdout.txt since it can't contain dots
       }
@@ -135,7 +135,7 @@ class DirectoryArchitect(val flat: Boolean,
 
   // resolve a literal *input* path
   def resolveLiteralPath(spec: LiteralSpec): File = {
-    val path = spec.rval.value
+    val path = spec.rValue.value
     Files.isAbsolute(path) match {
       case true => new File(Files.normalize(path))
       // relative paths are resolved relative to the directory
@@ -154,7 +154,7 @@ class DirectoryArchitect(val flat: Boolean,
 
     srcTaskDefOpt match {
       // no source task? this better be a literal
-      case None => srcSpec.rval match {
+      case None => srcSpec.rValue match {
         // gah, erasure!
         case Literal(path) => resolveLiteralPath(srcSpec.asInstanceOf[LiteralSpec])
         case _ => throw new RuntimeException(s"No source task found for spec ${mySpec} with source ${srcSpec}")

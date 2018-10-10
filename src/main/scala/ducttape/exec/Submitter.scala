@@ -7,13 +7,13 @@ import ducttape.util.Environment
 import ducttape.workflow.Realization
 import ducttape.util.Shell
 import ducttape.syntax.FileFormatException
-import ducttape.syntax.AbstractSyntaxTree.BashCode
-import ducttape.syntax.AbstractSyntaxTree.ActionDef
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.SubmitterDef
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
+import ducttape.syntax.AST.BashCode
+import ducttape.syntax.AST.ActionDef
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.SubmitterDef
+import ducttape.syntax.AST.WorkflowDefinition
 import ducttape.workflow.Branch
 import ducttape.util.BashException
 import ducttape.util.Files
@@ -33,7 +33,7 @@ class Submitter(submitters: Seq[SubmitterDef]) extends Logging {
   // we should never pass the workflow definition anywhere else...
   private def getSubmitter(submitterSpec: ResolvedLiteralSpec): SubmitterDef = {
 
-    val submitterName = submitterSpec.srcSpec.rval.value
+    val submitterName = submitterSpec.srcSpec.rValue.value
     submitters.find { s => s.name.toString == submitterName } match {
       case Some(s) => s
       case None => throw new FileFormatException(s"Submitter ${submitterName} not defined",
@@ -75,7 +75,7 @@ class Submitter(submitters: Seq[SubmitterDef]) extends Logging {
     val dotParamsForSubmitter: Seq[ResolvedLiteralSpec] = allDotParams.filter { litSpec: ResolvedLiteralSpec =>
       requiredParams.contains(litSpec.origSpec.name)
     }
-    val dotParamsEnv: Seq[(String,String)] = dotParamsForSubmitter.map { p => (p.origSpec.name, p.srcSpec.rval.value) }
+    val dotParamsEnv: Seq[(String,String)] = dotParamsForSubmitter.map { p => (p.origSpec.name, p.srcSpec.rValue.value) }
     debug(s"Dot parameters going into environment for run action are: ${dotParamsEnv}")
     val runAction = getRunAction(submitterDef)
 

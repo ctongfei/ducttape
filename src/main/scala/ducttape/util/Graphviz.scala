@@ -2,15 +2,15 @@
 
 package ducttape.util
 
-import ducttape.syntax.AbstractSyntaxTree.Block
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.Specs
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.TaskInputs
-import ducttape.syntax.AbstractSyntaxTree.TaskOutputs
-import ducttape.syntax.AbstractSyntaxTree.TaskPackageNames
-import ducttape.syntax.AbstractSyntaxTree.TaskParams
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
+import ducttape.syntax.AST.Block
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.Specs
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.TaskInputs
+import ducttape.syntax.AST.TaskOutputs
+import ducttape.syntax.AST.TaskPackageNames
+import ducttape.syntax.AST.TaskParams
+import ducttape.syntax.AST.WorkflowDefinition
 
 
 

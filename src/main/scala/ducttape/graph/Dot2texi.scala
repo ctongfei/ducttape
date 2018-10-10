@@ -2,7 +2,7 @@
 
 package ducttape.graph
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 
 
 object Dot2texi {

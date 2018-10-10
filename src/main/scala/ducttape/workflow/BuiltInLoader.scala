@@ -4,9 +4,9 @@ package ducttape.workflow
 
 import java.io.File
 
-import ducttape.syntax.AbstractSyntaxTree.Block
+import ducttape.syntax.AST.Block
 import ducttape.syntax.GrammarParser
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDefinition
 import ducttape.util.Files
 
 import grizzled.slf4j.Logging

@@ -2,7 +2,7 @@
 
 package ducttape.workflow.builder
 
-import ducttape.syntax.AbstractSyntaxTree.BranchGraftElement
+import ducttape.syntax.AST.BranchGraftElement
 import ducttape.workflow.Branch
 import ducttape.workflow.BranchFactory
 import ducttape.workflow.BranchPoint

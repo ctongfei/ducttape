@@ -2,9 +2,9 @@
 
 package ducttape.syntax
 
-import AbstractSyntaxTree.ASTType
+import AST.Node
 
-class AbstractSyntaxTreeException(element: ASTType, msg: String) 
+class AbstractSyntaxTreeException(element: Node, msg: String)
   extends RuntimeException(
       "ERROR: line %d column %d: %s".format(
         element.endPos.line, 

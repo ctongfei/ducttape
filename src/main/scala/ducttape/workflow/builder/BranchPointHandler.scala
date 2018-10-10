@@ -2,17 +2,17 @@
 
 package ducttape.workflow.builder
 
-import ducttape.syntax.AbstractSyntaxTree.ASTType
-import ducttape.syntax.AbstractSyntaxTree.BranchPointDef
-import ducttape.syntax.AbstractSyntaxTree.BranchSpec
-import ducttape.syntax.AbstractSyntaxTree.ConfigVariable
-import ducttape.syntax.AbstractSyntaxTree.Literal
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.Sequence
-import ducttape.syntax.AbstractSyntaxTree.SequentialBranchPoint
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.Unbound
+import ducttape.syntax.AST.Node
+import ducttape.syntax.AST.BranchPointDef
+import ducttape.syntax.AST.BranchSpec
+import ducttape.syntax.AST.ConfigVariable
+import ducttape.syntax.AST.Literal
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.Sequence
+import ducttape.syntax.AST.SequentialBranchPoint
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.Unbound
 import ducttape.syntax.Namespace
 import ducttape.syntax.FileFormatException
 import ducttape.workflow.Branch
@@ -39,7 +39,7 @@ object BranchPointHandler extends Logging {
                                    prevTree, branchHistory, curTask, curSpec, prevGrafts,
                                    resolveVarFunc)
 
-    curSpec.rval match {
+    curSpec.rValue match {
       // we found another branch point -- keep recursing
       case bp @ BranchPointDef(branchPointNameOpt, branchSpecz) => {
         val branchSpecs = branchSpecz
@@ -118,7 +118,7 @@ object BranchPointHandler extends Logging {
             val newHistory = branchHistory ++ Seq(branch)
                 // check if this branch assignment spec's rvalue defines another branch point
                 // Note that it might not even be an assignment, since we allow anonymous branch specs
-            branchSpec.rval match {
+            branchSpec.rValue match {
               // we found a nested branch point -- recursively call resolveBranchPoint()
                 case BranchPointDef(_,_) => {
                   // no grafts needed/possible here
@@ -184,7 +184,7 @@ object BranchPointHandler extends Logging {
         // resolveVarFunc might have returned a branch point to us
         // if it traced back to a parent's parameter, which is itself a branch point
         // if that's the case, we should continue recursing. otherwise, just add.
-        sourceSpecInfo.srcSpec.rval match {
+        sourceSpecInfo.srcSpec.rValue match {
           // phew, we got either a literal (filename or parameter value)
           // or an unbound output (ducttape will determine the output file path of this task
           // that will be run in the future)
@@ -221,7 +221,7 @@ object BranchPointHandler extends Logging {
       }
     }
 
-    private def getName(branchPointNameOpt: Option[String], astElem: ASTType) = branchPointNameOpt match {
+    private def getName(branchPointNameOpt: Option[String], astElem: Node) = branchPointNameOpt match {
       case Some(name) => name
       case None => throw new FileFormatException("Branch point name is required", astElem)
     }

@@ -142,6 +142,6 @@ class WorkflowDatabase(dbFile: File) {
 // represents the serialized workflow state from a DB
 class WorkflowState {
   def toGraphViz(): String = {
-    ""
+    "" // TODO
   }
 }

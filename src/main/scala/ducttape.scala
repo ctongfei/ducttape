@@ -1,86 +1,27 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import System._
+
 import collection._
 import sys.ShutdownHookThread
-
 import java.io.File
-import java.util.concurrent.ExecutionException
-import java.util.regex.Pattern
+import java.util.regex._
 
-import ducttape.cli.Config
-import ducttape.cli.Directives
-import ducttape.cli.ErrorUtils
-import ducttape.cli.ErrorUtils.ex2err
-import ducttape.cli.Opts
-import ducttape.cli.EnvironmentMode
-import ducttape.cli.Plans
-import ducttape.cli.RealizationGlob
-import ducttape.cli.ExecuteMode
-import ducttape.db.WorkflowDatabase
-import ducttape.db.TaskInfo
-import ducttape.db.PackageInfo
-import ducttape.db.InputInfo
-import ducttape.db.OutputInfo
-import ducttape.db.ParamInfo
-import ducttape.exec.CompletionChecker
-import ducttape.exec.Executor
-import ducttape.exec.InputChecker
-import ducttape.exec.PidWriter
-import ducttape.exec.PackageBuilder
-import ducttape.exec.PackageFinder
-import ducttape.exec.TaskEnvironment
-import ducttape.exec.UnpackedDagVisitor
-import ducttape.exec.DirectoryArchitect
-import ducttape.exec.PackageVersioner
-import ducttape.exec.PackageStatus
-import ducttape.exec.FullTaskEnvironment
-import ducttape.exec.PartialOutputMover
-import ducttape.exec.ForceUnlocker
-import ducttape.hyperdag.walker.Traversal
-import ducttape.hyperdag.walker.Arbitrary
-import ducttape.hyperdag.walker.BreadthFirst
-import ducttape.hyperdag.walker.DepthFirst
-import ducttape.syntax.AbstractSyntaxTree._
-import ducttape.syntax.GrammarParser
-import ducttape.syntax.StaticChecker
-import ducttape.syntax.Namespace
-import ducttape.syntax.ErrorBehavior
+import ducttape.cli.ErrorUtils._
+import ducttape.cli._
+import ducttape.db._
+import ducttape.exec._
+import ducttape.hyperdag.walker._
+import ducttape.syntax.AST._
+import ducttape.syntax._
 import ducttape.syntax.ErrorBehavior._
-import ducttape.workflow.builder.WorkflowBuilder
-import ducttape.workflow.HyperWorkflow
-import ducttape.workflow.Realization
-import ducttape.workflow.TaskTemplate
-import ducttape.workflow.RealTask
-import ducttape.workflow.VersionedTask
-import ducttape.workflow.VersionedTaskId
-import ducttape.versioner.VersionedPackageId
-import ducttape.workflow.BranchPoint
-import ducttape.workflow.Branch
-import ducttape.workflow.RealizationPlan
-import ducttape.workflow.PlanPolicy
-import ducttape.workflow.VertexFilter
+import ducttape.workflow.builder._
+import ducttape.workflow._
+import ducttape.versioner._
+import ducttape.syntax._
+import ducttape.util._
 import ducttape.workflow.Types._
-import ducttape.workflow.BuiltInLoader
-import ducttape.workflow.VertexFilter
-import ducttape.workflow.Visitors
-import ducttape.versioner.WorkflowVersionInfo
-import ducttape.versioner.FakeWorkflowVersionInfo
-import ducttape.versioner.TentativeWorkflowVersionInfo
-import ducttape.versioner.WorkflowVersionHistory
-import ducttape.syntax.FileFormatException
-import ducttape.syntax.WorkflowChecker
-import ducttape.util.Files
-import ducttape.util.OrderedSet
-import ducttape.util.MutableOrderedSet
-import ducttape.util.Environment
-import ducttape.util.LogUtils
-import ducttape.util.DucttapeException
-import ducttape.util.BashException
-import ducttape.util.Globs
-import ducttape.util.Shell
-
-import grizzled.slf4j.Logging
+import grizzled.slf4j._
 
 object Ducttape extends Logging {
 
@@ -221,9 +162,9 @@ object Ducttape extends Logging {
 
 
 
-    System.out.println(new ducttape.graph.PackedGraph(wd))
+    //System.out.println(new ducttape.graph.PackedGraph(wd))
     //System.out.println(new ducttape.util.Graphviz(wd).dot2tex())
-    System.exit(-1)
+    //System.exit(-1)
     val builder = new WorkflowBuilder(wd, confSpecs, builtins)
     val workflow: HyperWorkflow = ex2err(builder.build())
 
@@ -341,7 +282,7 @@ object Ducttape extends Logging {
       packageVersions
     }
 
-    def list {
+    def list: Unit = {
       val planPolicy = getPlannedVertices()
       for (v: UnpackedWorkVert <- workflow.unpackedWalker(planPolicy).iterator) {
         val taskT: TaskTemplate = v.packed.value.get
@@ -354,7 +295,7 @@ object Ducttape extends Logging {
     }
 
     // explain why certain realizations weren't generated (it's not always obvious)
-    def explain {
+    def explain: Unit = {
       // TODO: More memory efficient uniquing strategy?
       val seen = new mutable.HashSet[(Option[String],String,String)]
       val have = new mutable.HashMap[String,mutable.HashSet[String]]
@@ -380,7 +321,7 @@ object Ducttape extends Logging {
       }
     }
 
-    def markDone {
+    def markDone: Unit = {
       // TODO: Support more than just the most recent version via a command line option
       if (opts.taskName == None) {
         opts.exitHelp("mark_done requires a taskName", 1)
@@ -418,7 +359,7 @@ object Ducttape extends Logging {
       }
     }
 
-    def viz {
+    def viz: Unit = {
       import ducttape.viz._
       opts.typeFlag.value match {
         case Some("debug") => {
@@ -493,7 +434,7 @@ object Ducttape extends Logging {
     }
 
     // TODO: Don't apply plan filtering to invalidation? More generally, we should let the user choose baseline-only, baseline-one-offs, cross product, or plan
-    def invalidate {
+    def invalidate: Unit = {
       if (opts.taskName == None) {
         opts.exitHelp("invalidate requires a taskName", 1)
       }
@@ -534,7 +475,7 @@ object Ducttape extends Logging {
       }
     }
 
-    def purge {
+    def purge: Unit = {
       if (opts.taskName == None) {
         opts.exitHelp("purge requires a taskName", 1)
       }

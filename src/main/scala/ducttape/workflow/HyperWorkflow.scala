@@ -10,11 +10,11 @@ import ducttape.workflow.Types.UnpackedWorkVert
 import ducttape.workflow.Types.WorkflowEdge
 import ducttape.workflow.Types.PackedWorkVert
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.PackageDef
-import ducttape.syntax.AbstractSyntaxTree.SubmitterDef
-import ducttape.syntax.AbstractSyntaxTree.VersionerDef
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.PackageDef
+import ducttape.syntax.AST.SubmitterDef
+import ducttape.syntax.AST.VersionerDef
+import ducttape.syntax.AST.WorkflowDefinition
 import ducttape.hyperdag.HyperEdge
 import ducttape.hyperdag.UnpackedVertex
 import ducttape.hyperdag.meta.PhantomMetaHyperDag

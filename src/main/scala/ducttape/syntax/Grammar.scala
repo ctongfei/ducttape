@@ -14,7 +14,7 @@ import scala.util.parsing.input.Positional
 import scala.util.matching.Regex
 import scala.util.parsing.input.NoPosition
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 import ducttape.cli.ErrorUtils
 import ducttape.util.Files
 
@@ -522,7 +522,7 @@ object Grammar {
     }
   )
 
-  val branchPointRefBranchName: Parser[ASTType] = {
+  val branchPointRefBranchName: Parser[Node] = {
     sequence |
     literalValue
   }
@@ -551,7 +551,7 @@ object Grammar {
     )
     } ^^ {
       case (bpName: String) ~ (branchName: String) => new BranchPointRef(bpName,List.apply(new Literal(branchName)))
-      case (bpName: String) ~ (branchNames: List[ASTType @unchecked]) => new BranchPointRef(bpName,branchNames)
+      case (bpName: String) ~ (branchNames: List[Node @unchecked]) => new BranchPointRef(bpName,branchNames)
     }
   )
 
@@ -627,7 +627,7 @@ object Grammar {
 
   val branchAssignment: Parser[Spec] = positioned(
       (basicAssignment("branch",branchSpecGenerator,failure(_),failure(_),failure(_),branchName) | rvalue) ^^ (
-          (x:ASTType) => {
+          (x:Node) => {
             val spec:Spec = x match {
               case assignment: AbstractSpec[_] => assignment
               case _: ShorthandTaskVariable => throw new RuntimeException("A shorthand task variable is not allowed as a bare right-hand side (where no left-hand side exists) in a branch assignment")
@@ -1165,7 +1165,7 @@ object Grammar {
     }
   }
 
-  def elements(importDir: File): Parser[Seq[ASTType]] = {
+  def elements(importDir: File): Parser[Seq[Node]] = {
     opt(whitespace) ~>
     rep(block|importStatement(importDir)) <~
     (
@@ -1174,6 +1174,6 @@ object Grammar {
         opt(whitespace)
     )
   } ^^ {
-    case (e:Seq[ASTType]) => e // note: GrammarParser takes care of collapsing imports now
+    case (e:Seq[Node]) => e // note: GrammarParser takes care of collapsing imports now
   }
 }

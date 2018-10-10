@@ -6,8 +6,8 @@ import collection._
 import ducttape.workflow.Realization
 import ducttape.workflow.RealTask
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.PackageDef
-import ducttape.syntax.AbstractSyntaxTree.Spec
+import ducttape.syntax.AST.PackageDef
+import ducttape.syntax.AST.Spec
 import ducttape.syntax.FileFormatException
 import java.io.File
 

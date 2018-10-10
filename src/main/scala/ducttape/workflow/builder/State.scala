@@ -2,8 +2,8 @@
 
 package ducttape.workflow.builder
 
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.TaskDef
 import ducttape.syntax.Namespace
 import ducttape.workflow.Branch
 import ducttape.workflow.BranchFactory

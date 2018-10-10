@@ -8,11 +8,11 @@ import math.Ordering
 import ducttape.cli.Directives
 import ducttape.workflow.Realization
 import ducttape.syntax.Namespace
-import ducttape.syntax.AbstractSyntaxTree.ActionDef
-import ducttape.syntax.AbstractSyntaxTree.PackageDef
-import ducttape.syntax.AbstractSyntaxTree.VersionerDef
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
+import ducttape.syntax.AST.ActionDef
+import ducttape.syntax.AST.PackageDef
+import ducttape.syntax.AST.VersionerDef
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.LiteralSpec
 import ducttape.syntax.FileFormatException
 import ducttape.syntax.Namespace
 import ducttape.util.Files
@@ -30,7 +30,7 @@ object Versioners {
   
     val versionerName: Namespace = dotVars.find { spec => spec.name == "versioner" } match {
       case Some(spec) => {
-        val namespaceStr: String = spec.asInstanceOf[LiteralSpec].rval.value
+        val namespaceStr: String = spec.asInstanceOf[LiteralSpec].rValue.value
         Namespace.fromString(namespaceStr)
       }
       case None => throw new FileFormatException(s"No versioner specified for package ${packageDef.name}", packageDef)
@@ -69,7 +69,7 @@ class PackageVersionerInfo(val versionerDef: VersionerDef) extends Logging {
   
   def getEnv(packageDef: PackageDef): Seq[(String,String)] = {
     val packageDotParams: Seq[LiteralSpec] = packageDef.params.filter(_.dotVariable).map(_.asInstanceOf[LiteralSpec])
-    packageDotParams.map { spec => (spec.name, spec.rval.value) }
+    packageDotParams.map { spec => (spec.name, spec.rValue.value) }
   }
 }
 

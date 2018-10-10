@@ -2,9 +2,9 @@
 
 package ducttape.workflow
 
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.LiteralSpec
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.LiteralSpec
+import ducttape.syntax.AST.TaskDef
 import ducttape.workflow.SpecTypes._
 
 /**

@@ -3,7 +3,7 @@
 package ducttape.viz
 
 import collection._
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.TaskDef
 
 object WorkflowViz {
   import ducttape.versioner._
@@ -43,7 +43,7 @@ object WorkflowViz {
           val DOLLAR = "$"
           def toString(sp: SpecPair) = sp.srcTask match {
             case Some(srcTask) => s"${sp.origSpec.name}=${DOLLAR}${sp.srcSpec.name}@${srcTask.name}"
-            case None => s"${sp.origSpec.name}=${DOLLAR}${sp.srcSpec.name} (=${sp.srcSpec.rval})"
+            case None => s"${sp.origSpec.name}=${DOLLAR}${sp.srcSpec.name} (=${sp.srcSpec.rValue})"
           }
           val edgeLabel: String = inputVals.map(toString(_)).mkString("\\n")
 
@@ -97,7 +97,7 @@ object WorkflowViz {
           val DOLLAR = "$"
           def toString(sp: ResolvedSpec) = sp.srcTask match {
             case Some(srcTask) => s"${sp.origSpec.name}=${DOLLAR}${sp.srcSpec.name}@${srcTask.name}"
-            case None => s"${sp.origSpec.name}=${DOLLAR}${sp.srcSpec.name} (=${sp.srcSpec.rval})"
+            case None => s"${sp.origSpec.name}=${DOLLAR}${sp.srcSpec.name} (=${sp.srcSpec.rValue})"
           }
           val edgeLabel: String = inputVals.map(toString(_)).mkString("\\n")
 

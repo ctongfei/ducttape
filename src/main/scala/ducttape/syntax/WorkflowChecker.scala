@@ -13,17 +13,17 @@ import ducttape.workflow.Visitors
 import ducttape.workflow.Realization
 import ducttape.workflow.PlanPolicy
 import ducttape.versioner.WorkflowVersionInfo
-import ducttape.syntax.AbstractSyntaxTree.BranchPointDef
-import ducttape.syntax.AbstractSyntaxTree.ConfigAssignment
-import ducttape.syntax.AbstractSyntaxTree.Spec
-import ducttape.syntax.AbstractSyntaxTree.WorkflowDefinition
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
-import ducttape.syntax.AbstractSyntaxTree.TaskLike
-import ducttape.syntax.AbstractSyntaxTree.ConfigDefinition
-import ducttape.syntax.AbstractSyntaxTree.PackageDef
-import ducttape.syntax.AbstractSyntaxTree.VersionerDef
-import ducttape.syntax.AbstractSyntaxTree.ActionDef
-import ducttape.syntax.AbstractSyntaxTree.Literal
+import ducttape.syntax.AST.BranchPointDef
+import ducttape.syntax.AST.ConfigAssignment
+import ducttape.syntax.AST.Spec
+import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.TaskDef
+import ducttape.syntax.AST.TaskLike
+import ducttape.syntax.AST.ConfigDefinition
+import ducttape.syntax.AST.PackageDef
+import ducttape.syntax.AST.VersionerDef
+import ducttape.syntax.AST.ActionDef
+import ducttape.syntax.AST.Literal
 import grizzled.slf4j.Logging
 import collection._
 
@@ -85,10 +85,10 @@ class WorkflowChecker(workflow: WorkflowDefinition,
 
       // don't allow branch points on outputs
       for (out: Spec <- task.outputs) {
-        out.rval match {
+        out.rValue match {
           case _: BranchPointDef => {
             errors += new FileFormatException("Outputs may not define branch points at %s:%d".
-              format(out.rval.declaringFile, out.rval.pos.line),
+              format(out.rValue.declaringFile, out.rValue.pos.line),
               List(out))
           }
           case _ => ;
@@ -183,7 +183,7 @@ class WorkflowChecker(workflow: WorkflowDefinition,
         case Some(spec) => errors += new FileFormatException("Packages cannot define a submitter: Package '%s'".format(packageDef.name), spec)
       }
 
-      for (param <- packageDef.params) param.rval match {
+      for (param <- packageDef.params) param.rValue match {
         case _: Literal => ;
         case _ => errors += new FileFormatException("Package parameters must be literals: Package '%s'".format(packageDef.name), packageDef)
       }

@@ -8,8 +8,8 @@ import scala.util.parsing.input.CharArrayReader
 import scala.util.parsing.input.Position
 import scala.util.parsing.input.Positional
 import java.io.File
-import ducttape.syntax.AbstractSyntaxTree.ASTType
-import ducttape.syntax.AbstractSyntaxTree.BashCode
+import ducttape.syntax.AST.Node
+import ducttape.syntax.AST.BashCode
 // TODO: Move this into unit tests
 /*
 object BashParser extends App with RegexParsers {

@@ -3,7 +3,7 @@
 package ducttape.workflow.builder
 
 import ducttape.workflow.Branch
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.TaskDef
 import ducttape.workflow.SpecTypes.SpecPair
 import scala.collection.mutable
 

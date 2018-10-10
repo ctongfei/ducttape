@@ -4,7 +4,7 @@ package ducttape.graph
 
 import scala.collection.mutable.HashMap
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 
 /**
  *
@@ -36,7 +36,7 @@ abstract sealed class Vertex(val id:String, val comment: Option[String] = None) 
     }
   }
 
-  override def toString() = comment match {
+  override def toString = comment match {
     case Some(str) => "%s:%s".format(str, id)
     case None => "ID=%s".format(id)
   }

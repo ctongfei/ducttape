@@ -3,7 +3,7 @@
 package ducttape.workflow.builder
 
 import collection._
-import ducttape.syntax.AbstractSyntaxTree.TaskDef
+import ducttape.syntax.AST.TaskDef
 import ducttape.workflow.TaskTemplate
 import ducttape.workflow.BranchPoint
 import ducttape.hyperdag.PackedVertex

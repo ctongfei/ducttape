@@ -7,7 +7,7 @@ import java.io.File
 import collection._
 
 import ducttape.syntax.FileFormatException
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 import ducttape.workflow.Branch
 import ducttape.workflow.Realization
 import ducttape.workflow.VersionedTask
@@ -25,7 +25,7 @@ class InputChecker(dirs: DirectoryArchitect) extends UnpackedDagVisitor with Log
       inSpec.srcTask match {
         case Some(_) => ; // input will be generated during workflow execution
         case None =>
-          inSpec.srcSpec.rval match {
+          inSpec.srcSpec.rValue match {
             case Literal(path) => {
               // detect and handle globs
               val literalSpec = inSpec.srcSpec.asInstanceOf[LiteralSpec]

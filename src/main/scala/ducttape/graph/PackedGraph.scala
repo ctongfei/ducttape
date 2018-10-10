@@ -3,7 +3,7 @@
 package ducttape.graph
 
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 
 class PackedGraph(val wd: WorkflowDefinition) extends Graph {
 

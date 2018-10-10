@@ -2,7 +2,7 @@
 
 package ducttape.graph
 
-import ducttape.syntax.AbstractSyntaxTree._
+import ducttape.syntax.AST._
 
 class GraphFragments(astNode:WorkflowDefinition) {
 
@@ -22,7 +22,7 @@ class GraphFragments(astNode:WorkflowDefinition) {
  */
 object GraphFragments {
 
-  private def recursivelyProcessAST(astNode:ASTType, vertex:Vertex) : Seq[Vertex] = {
+  private def recursivelyProcessAST(astNode:Node, vertex:Vertex) : Seq[Vertex] = {
     astNode match {
       case actionDef               : ActionDef               => recursivelyProcess( actionDef               , vertex)
       case baselineBlockDef        : BaselineBlockDef        => recursivelyProcess( baselineBlockDef        , vertex)
@@ -360,7 +360,7 @@ object GraphFragments {
   }
 
 
-  private def justProcessChildren(astNode:ASTType, vertex:Vertex) : Seq[Vertex] = {
+  private def justProcessChildren(astNode:Node, vertex:Vertex) : Seq[Vertex] = {
 
     // For the purposes of converting an AST into a packed graph, certain AST nodes do not generate a vertex
     //
@@ -380,8 +380,8 @@ object GraphFragments {
     return current ++ children
   }
 
-  private def processChildren(astNode:ASTType, vertex:Vertex) : Seq[Vertex] = {
-    return astNode.children.flatMap({ child:ASTType => recursivelyProcessAST(child, vertex)})
+  private def processChildren(astNode:Node, vertex:Vertex) : Seq[Vertex] = {
+    return astNode.children.flatMap({ child:Node => recursivelyProcessAST(child, vertex)})
   }
 
 }
