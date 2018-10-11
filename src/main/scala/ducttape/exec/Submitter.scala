@@ -13,7 +13,7 @@ import ducttape.syntax.AST.Spec
 import ducttape.syntax.AST.LiteralSpec
 import ducttape.syntax.AST.TaskDef
 import ducttape.syntax.AST.SubmitterDef
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.workflow.Branch
 import ducttape.util.BashException
 import ducttape.util.Files

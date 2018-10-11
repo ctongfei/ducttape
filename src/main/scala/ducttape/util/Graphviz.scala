@@ -10,12 +10,12 @@ import ducttape.syntax.AST.TaskInputs
 import ducttape.syntax.AST.TaskOutputs
 import ducttape.syntax.AST.TaskPackageNames
 import ducttape.syntax.AST.TaskParams
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 
 
 
 
-class Graphviz(wd: WorkflowDefinition) {
+class Graphviz(wd: WorkflowDef) {
 
 	private class IdentifierTracker(private val name:String, private val map:java.util.IdentityHashMap[Object,String]) {
 

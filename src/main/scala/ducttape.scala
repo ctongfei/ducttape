@@ -49,18 +49,18 @@ object Ducttape extends Logging {
     // read user config before printing anything to screen
     val userConfigFile = new File(Environment.UserHomeDir, ".ducttape")
     debug(s"Checking for user config at: ${userConfigFile.getAbsolutePath}")
-    val userConfig: WorkflowDefinition = if (userConfigFile.exists) {
+    val userConfig: WorkflowDef = if (userConfigFile.exists) {
       GrammarParser.readConfig(userConfigFile)
     } else {
-      new WorkflowDefinition(elements=Nil, files=Nil)
+      new WorkflowDef(elements=Nil, files=Nil)
     }
 
     // make these messages optional with verbosity levels?
     debug(s"Reading workflow from ${opts.workflowFile.getAbsolutePath}")
-    val wd: WorkflowDefinition = {
+    val wd: WorkflowDef = {
       val workflowOnly = ex2err(GrammarParser.readWorkflow(opts.workflowFile))
 
-      val confStuff: WorkflowDefinition = ex2err(opts.config_file.value match {
+      val confStuff: WorkflowDef = ex2err(opts.config_file.value match {
         case Some(confFile) => {
           // TODO: Make sure workflow doesn't have anonymous conf?
           workflowOnly.anonymousConfig match {
@@ -71,7 +71,7 @@ object Ducttape extends Logging {
           err.println(s"Reading workflow configuration: ${confFile}")
           GrammarParser.readConfig(new File(confFile))
         }
-        case None => new WorkflowDefinition(elements=Nil, files=Nil)
+        case None => new WorkflowDef(elements=Nil, files=Nil)
       })
 
       workflowOnly ++ confStuff ++ userConfig
@@ -94,7 +94,7 @@ object Ducttape extends Logging {
           // otherwise, use the conf the user requested, if any
           confNameOpt match {
             case Some(name) => {
-              wd.configs.find { case c: ConfigDefinition => c.name == confNameOpt } match {
+              wd.configs.find { case c: ConfigDef => c.name == confNameOpt } match {
                 case Some(x) => x.lines
                 case None => throw new DucttapeException(s"Configuration not found: ${name}")
               }
@@ -131,7 +131,7 @@ object Ducttape extends Logging {
       new DirectoryArchitect(directives.flat, directives.versionedTasks, workflowBaseDir, confNameOpt)
     }
 
-    val builtins: Seq[WorkflowDefinition] = BuiltInLoader.load(dirs.builtinsDir)
+    val builtins: Seq[WorkflowDef] = BuiltInLoader.load(dirs.builtinsDir)
 
     // pass 1 error checking: directly use workflow AST
     {

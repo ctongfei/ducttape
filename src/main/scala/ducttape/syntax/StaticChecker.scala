@@ -28,7 +28,7 @@ class StaticChecker(undeclaredBehavior: ErrorBehavior,
   /**
    * Returns a tuple of (warnings, errors)
    */
-  def check(wd: WorkflowDefinition): (Seq[FileFormatException], Seq[FileFormatException]) = {
+  def check(wd: WorkflowDef): (Seq[FileFormatException], Seq[FileFormatException]) = {
 
     val warnings = new mutable.ArrayBuffer[FileFormatException]
     val errors = new mutable.ArrayBuffer[FileFormatException]
@@ -84,7 +84,7 @@ class StaticChecker(undeclaredBehavior: ErrorBehavior,
     // check for unsupported block types that are in the grammar, but
     // not yet implemented
     for (block <- wd.blocks) block match {
-      case funcCall: CallDefinition => ;
+      case funcCall: CallDef => ;
 
       case groupLike: GroupLike => {
         groupLike.keyword match {
@@ -109,14 +109,14 @@ class StaticChecker(undeclaredBehavior: ErrorBehavior,
         }
       }
 
-      case configLike: ConfigDefinition => {
+      case configLike: ConfigDef => {
         configLike.keyword match {
           case "global" => ;
           case "config" => ;
         }
       }
 
-      case plan: PlanDefinition => ;
+      case plan: PlanDef => ;
     }
 
     val seenTasks = new mutable.HashMap[Namespace,TaskDef]

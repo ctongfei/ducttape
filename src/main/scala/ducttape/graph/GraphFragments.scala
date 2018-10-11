@@ -4,7 +4,7 @@ package ducttape.graph
 
 import ducttape.syntax.AST._
 
-class GraphFragments(astNode:WorkflowDefinition) {
+class GraphFragments(astNode:WorkflowDef) {
 
   val vertices:Seq[Vertex] = {
     val rootVertex = new RootVertex()
@@ -34,10 +34,10 @@ object GraphFragments {
       case branchPointDef          : BranchPointDef          => recursivelyProcess( branchPointDef          , vertex)
       case branchPointRef          : BranchPointRef          => recursivelyProcess( branchPointRef          , vertex)
       case branchSpec              : BranchSpec[RValue]      => recursivelyProcess( branchSpec              , vertex)
-      case callDefinition          : CallDefinition          => recursivelyProcess( callDefinition          , vertex)
+      case callDefinition          : CallDef          => recursivelyProcess( callDefinition          , vertex)
       case comments                : Comments                => recursivelyProcess( comments                , vertex)
       case configAssignment        : ConfigAssignment        => recursivelyProcess( configAssignment        , vertex)
-      case configDefinition        : ConfigDefinition        => recursivelyProcess( configDefinition        , vertex)
+      case configDefinition        : ConfigDef        => recursivelyProcess( configDefinition        , vertex)
       case configParamSpec         : ConfigParamSpec[RValue] => recursivelyProcess( configParamSpec         , vertex)
       case configVariable          : ConfigVariable          => recursivelyProcess( configVariable          , vertex)
       case crossProduct            : CrossProduct            => recursivelyProcess( crossProduct            , vertex)
@@ -46,7 +46,7 @@ object GraphFragments {
       case literal                 : Literal                 => recursivelyProcess( literal                 , vertex)
       case packageDef              : PackageDef              => recursivelyProcess( packageDef              , vertex)
       case packageSpec             : PackageSpec             => recursivelyProcess( packageSpec             , vertex)
-      case planDefinition          : PlanDefinition          => recursivelyProcess( planDefinition          , vertex)
+      case planDefinition          : PlanDef          => recursivelyProcess( planDefinition          , vertex)
       case sequence                : Sequence                => recursivelyProcess( sequence                , vertex)
       case sequentialBranchPoint   : SequentialBranchPoint   => recursivelyProcess( sequentialBranchPoint   , vertex)
       case shorthandBranchGraft    : ShorthandBranchGraft    => recursivelyProcess( shorthandBranchGraft    , vertex)
@@ -67,7 +67,7 @@ object GraphFragments {
       case taskVariable            : TaskVariable            => recursivelyProcess( taskVariable            , vertex)
       case unbound                 : Unbound                 => recursivelyProcess( unbound                 , vertex)
       case versionerDef            : VersionerDef            => recursivelyProcess( versionerDef            , vertex)
-      case workflowDefinition      : WorkflowDefinition      => recursivelyProcess( workflowDefinition      , vertex)
+      case workflowDefinition      : WorkflowDef      => recursivelyProcess( workflowDefinition      , vertex)
     }
   }
 
@@ -127,7 +127,7 @@ object GraphFragments {
     return Seq(branchVertex) ++ children
   }
 
-  private def recursivelyProcess( callDefinition          : CallDefinition           , vertex:Vertex) : Seq[Vertex] = {
+  private def recursivelyProcess(callDefinition          : CallDef, vertex:Vertex) : Seq[Vertex] = {
     // By this point, a concrete TaskDefinition should have already been created for every CallDefinition object.
     //
     // Therefore, we can now safely ignore any CallDefinition objects we encounter.
@@ -142,7 +142,7 @@ object GraphFragments {
     return justProcessChildren(configAssignment, vertex)
   }
 
-  private def recursivelyProcess( configDefinition        : ConfigDefinition         , vertex:Vertex) : Seq[Vertex] = {
+  private def recursivelyProcess(configDefinition        : ConfigDef, vertex:Vertex) : Seq[Vertex] = {
 
     val currentVertex = new ConfigDefinitionVertex(configDefinition)
 
@@ -242,7 +242,7 @@ object GraphFragments {
     return Seq(packageVertex) ++ children
   }
 
-  private def recursivelyProcess( planDefinition          : PlanDefinition           , vertex:Vertex) : Seq[Vertex] = {
+  private def recursivelyProcess(planDefinition          : PlanDef, vertex:Vertex) : Seq[Vertex] = {
     val planVertex = new PlanDefinitionVertex(planDefinition)
 
     val children = processChildren(planDefinition, planVertex)
@@ -355,7 +355,7 @@ object GraphFragments {
     ???
   }
 
-  private def recursivelyProcess( workflowDefinition      : WorkflowDefinition       , vertex:Vertex) : Seq[Vertex] = {
+  private def recursivelyProcess(workflowDefinition      : WorkflowDef, vertex:Vertex) : Seq[Vertex] = {
     return justProcessChildren(workflowDefinition, vertex)
   }
 

@@ -10,7 +10,7 @@ import collection._
 import System._
 import ducttape.util.Files
 import ducttape.syntax.GrammarParser
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.syntax.AST.TaskDef
 import org.pegdown.ast.RootNode
 import org.pegdown.ast.Visitor
@@ -179,7 +179,7 @@ object DucttapeDoc {
         
         //System.err.println("Analyzing file: " + file.getAbsolutePath)
         
-        val workflow: WorkflowDefinition = GrammarParser.readWorkflow(file)
+        val workflow: WorkflowDef = GrammarParser.readWorkflow(file)
         val headerComments: Seq[String] = workflow.blocks.headOption match {
           case None => Seq.empty
           case Some(block) => block.comments.value match {
@@ -217,10 +217,10 @@ object DucttapeDoc {
   }
 
   def handleFile(
-      sectionName: String,
-      lessonName: String,
-      workflow: WorkflowDefinition,
-      workflowFile: File)
+                  sectionName: String,
+                  lessonName: String,
+                  workflow: WorkflowDef,
+                  workflowFile: File)
      (implicit f: Formatter) = {
     
     val buffer = new mutable.ArrayBuffer[String]

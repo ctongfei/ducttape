@@ -6,14 +6,14 @@ import java.io.File
 
 import ducttape.syntax.AST.Block
 import ducttape.syntax.GrammarParser
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.util.Files
 
 import grizzled.slf4j.Logging
 
 object BuiltInLoader extends Logging {
   
-  def load(builtInsDir: File): Seq[WorkflowDefinition] = {
+  def load(builtInsDir: File): Seq[WorkflowDef] = {
     for (file <- findBuiltIns(builtInsDir)) yield {
       debug("Loading builtin: %s".format(file.getAbsolutePath))
       try {

@@ -15,7 +15,7 @@ import ducttape.syntax.AST.ConfigVariable
 import ducttape.syntax.AST.CrossProduct
 import ducttape.syntax.AST.Literal
 import ducttape.syntax.AST.LiteralSpec
-import ducttape.syntax.AST.PlanDefinition
+import ducttape.syntax.AST.PlanDef
 import ducttape.syntax.AST.Sequence
 import ducttape.syntax.AST.SequentialBranchPoint
 import ducttape.syntax.AST.Spec
@@ -25,7 +25,7 @@ import ducttape.syntax.AST.TaskHeader
 import ducttape.syntax.AST.TaskVariable
 import ducttape.syntax.AST.Unbound
 import ducttape.syntax.AST.VersionerDef
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.syntax.AbstractSyntaxTreeException
 import ducttape.syntax.AST.BashCode
 import ducttape.syntax.FileFormatException
@@ -59,7 +59,7 @@ import grizzled.slf4j.Logging
  *
  * See [[ducttape.hyperdag.meta.PhantomMetaHyperDag]] for an explanation of phantom vertices.
  */
-class WorkflowBuilder(wd: WorkflowDefinition, configSpecs: Seq[ConfigAssignment], builtins: Seq[WorkflowDefinition])
+class WorkflowBuilder(wd: WorkflowDef, configSpecs: Seq[ConfigAssignment], builtins: Seq[WorkflowDef])
   extends Logging {
 
   import WorkflowBuilder._
@@ -79,8 +79,8 @@ class WorkflowBuilder(wd: WorkflowDefinition, configSpecs: Seq[ConfigAssignment]
     }
   }
 
-  def buildPlans(planDefs: Seq[PlanDefinition]): Seq[RealizationPlan] = {
-    planDefs.flatMap { planDef: PlanDefinition =>
+  def buildPlans(planDefs: Seq[PlanDef]): Seq[RealizationPlan] = {
+    planDefs.flatMap { planDef: PlanDef =>
       val numReachClauses = planDef.crossProducts.size
       var i = 0
       planDef.crossProducts.map { cross: CrossProduct =>
@@ -298,9 +298,9 @@ class WorkflowBuilder(wd: WorkflowDefinition, configSpecs: Seq[ConfigAssignment]
     val plans: Seq[RealizationPlan] = buildPlans(wd.plans)
 
     // TODO: More checking on submitters and versioners?
-    val submitters: Seq[SubmitterDef] = wd.submitters ++ builtins.flatMap { b: WorkflowDefinition => b.submitters }
+    val submitters: Seq[SubmitterDef] = wd.submitters ++ builtins.flatMap { b: WorkflowDef => b.submitters }
     debug("Workflow has submitters: %s".format(submitters.map(_.name).mkString(" ")))
-    val versioners: Seq[VersionerDef] = wd.versioners ++ builtins.flatMap { b: WorkflowDefinition => b.versioners }
+    val versioners: Seq[VersionerDef] = wd.versioners ++ builtins.flatMap { b: WorkflowDef => b.versioners }
     debug("Workflow has versioners: %s".format(versioners.map(_.name).mkString(" ")))
 
     val result = new HyperWorkflow(dag.build(), wd, packageDefs, plans, submitters, versioners, branchPointFactory, branchFactory)

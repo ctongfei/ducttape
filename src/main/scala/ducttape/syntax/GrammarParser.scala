@@ -15,7 +15,7 @@ import ducttape.util.IO
 
 object GrammarParser extends RegexParsers {
 
-  override val skipWhitespace = false;
+  override val skipWhitespace = false
 
   private def addFileInfo(element: Node, file: File) {
     // don't steamroll filenames from import statements!
@@ -25,20 +25,20 @@ object GrammarParser extends RegexParsers {
     element.children.foreach(addFileInfo(_, file))
   }
 
-  def readWorkflow(file: File, isImported: Boolean = false): WorkflowDefinition = {
+  def readWorkflow(file: File, isImported: Boolean = false): WorkflowDef = {
     val importDir: File = file.getAbsoluteFile.getParentFile
     val result: ParseResult[Seq[Node]] = parseAll(Grammar.elements(importDir), IO.read(file, "UTF-8"))
     val pos = result.next.pos
 
-    return result match {
+    result match {
       case Success(elements: Seq[Node], _) => {
         elements.foreach(addFileInfo(_, file))
-        new WorkflowDefinition(elements, Seq(file), isImported).collapseImports.collapseFunctionCallTasks()
+        WorkflowDef(elements, Seq(file), isImported).collapseImports.collapseFunctionCallTasks()
       }
       case Failure(msg, _) => throw new FileFormatException(msg, file, pos)
       case Error(msg, _) => throw new FileFormatException(msg, file, pos)
     }
   }
 
-  def readConfig(file: File): WorkflowDefinition = readWorkflow(file)
+  def readConfig(file: File): WorkflowDef = readWorkflow(file)
 }

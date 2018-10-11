@@ -5,9 +5,7 @@ package ducttape.syntax
 import scala.util.parsing.input.Positional
 import java.io.File
 import scala.util.parsing.input.Position
-import scala.collection.immutable.NumericRange.Inclusive
-
-import ducttape.util.Anonymous
+import ducttape.util._
 
 object AST {
 
@@ -337,39 +335,31 @@ object AST {
   class PackageDef(      comments: Comments, name: Namespace, header:TaskHeader, commands:BashCode) extends TaskLike(comments, keyword="package",  name, header, commands)
   class SummaryOfDef(    comments: Comments, name: Namespace, header:TaskHeader, commands:BashCode) extends TaskLike(comments, keyword="of",       name, header, commands)
 
-  /** Short for "TaskDefinition". Abbreviated due to its pervasiveness in the code. */
-  class TaskDef(         comments: Comments, name: Namespace, header:TaskHeader, commands:BashCode) extends TaskLike(comments, keyword="task",     name, header, commands) {
-    /**
-     * Constructs a concrete task definition
-     * from a function definition and a function call.
-     */
-    def this(taskName: Namespace, functionDefinition: FuncDef, functionCall: CallDefinition) =
-      this(functionCall.comments,
-           taskName,
-           functionCall.header,
-           functionDefinition.commands)
+  class TaskDef(         comments: Comments, name: Namespace, header:TaskHeader, commands:BashCode) extends TaskLike(comments, keyword="task",     name, header, commands)
+
+  object TaskDef {
+    def apply(taskName: Namespace, funcDef: FuncDef, funcCall: CallDef) =
+      new TaskDef(funcCall.comments, taskName, funcCall.header, funcDef.commands)
   }
 
-  case class CallDefinition(val comments: Comments,
-                       val name: String,
-                       val header: TaskHeader,
-                       val functionName: Namespace) extends Block {
+  case class CallDef(comments: Comments, name: String, header: TaskHeader, functionName: Namespace) extends Block {
     override def children = Seq(comments, header)
-    override def toString() = name
+    override def toString = name
   }
 
-  abstract sealed case class GroupLike(val comments: Comments,
-                        val keyword: String,
-                        val name: Namespace,
-                        val header: TaskHeader,
-                        val blocks: Seq[Block]) extends Block {
-    private lazy val taskLikes = blocks.collect{ case x: TaskLike => x}
+  abstract class GroupLike(comments: Comments,
+                        keyword: String,
+                        name: Namespace,
+                        header: TaskHeader,
+                        blocks: Seq[Block]) extends Block {
+
+    private lazy val taskLikes = blocks.collect { case x: TaskLike => x }
 
     // only has members for SubmitterDefs and VersionerDefs (but adding more info to the typesystem gets ridiculous)
-    lazy val actions: Seq[ActionDef] = taskLikes.collect{ case x: ActionDef => x } //taskLikes.filter(_.keyword == "action")
+    lazy val actions: Seq[ActionDef] = taskLikes.collect { case x: ActionDef => x } //taskLikes.filter(_.keyword == "action")
 
     // only has members for SummaryDefs (but adding more info to the typesystem gets ridiculous)
-    lazy val ofs: Seq[SummaryOfDef] = taskLikes.collect{ case x: SummaryOfDef => x } //taskLikes.filter(_.keyword == "of")
+    lazy val ofs: Seq[SummaryOfDef] = taskLikes.collect { case x: SummaryOfDef => x } //taskLikes.filter(_.keyword == "of")
 
     private lazy val packageSpecList: Seq[TaskPackageNames] = header.specsList.collect { case x: TaskPackageNames => x }
     private lazy val inputSpecList: Seq[TaskInputs] = header.specsList.collect { case x: TaskInputs => x }
@@ -381,100 +371,98 @@ object AST {
     lazy val inputs: Seq[Spec] = inputSpecList.flatMap(_.specs)
     lazy val outputs: Seq[Spec] = outputSpecList.flatMap(_.specs)
     lazy val params: Seq[Spec] = paramSpecList.flatMap(_.specs)
-    lazy val allSpecs: Seq[Spec] = header.specsList.flatMap { specs: Specs => specs.specs }
+    lazy val allSpecs: Seq[Spec] = header.specsList.flatMap(_.specs)
 
     override def children = Seq(comments, header) ++ blocks
-    override def toString() = name.toString
+    override def toString = name.toString
   }
 
-  class BranchPointBlock(comments: Comments, name: Namespace, header:TaskHeader, blocks:Seq[Block]) extends GroupLike(comments, keyword="branchpoint", name, header, blocks)
-  class GroupDef(        comments: Comments, name: Namespace, header:TaskHeader, blocks:Seq[Block]) extends GroupLike(comments, keyword="group",       name, header, blocks)
-  class SubmitterDef(    comments: Comments, name: Namespace, header:TaskHeader, blocks:Seq[Block]) extends GroupLike(comments, keyword="submitter",   name, header, blocks)
-  class SummaryDef(      comments: Comments, name: Namespace, header:TaskHeader, blocks:Seq[Block]) extends GroupLike(comments, keyword="summary",     name, header, blocks)
-  class VersionerDef(    comments: Comments, name: Namespace, header:TaskHeader, blocks:Seq[Block]) extends GroupLike(comments, keyword="versioner",   name, header, blocks)
+  case class BranchPointBlock(comments: Comments, name: Namespace, header: TaskHeader, blocks: Seq[Block]) extends GroupLike(comments, keyword = "branchpoint", name, header, blocks)
+  case class GroupDef(        comments: Comments, name: Namespace, header: TaskHeader, blocks: Seq[Block]) extends GroupLike(comments, keyword = "group",       name, header, blocks)
+  case class SubmitterDef(    comments: Comments, name: Namespace, header: TaskHeader, blocks: Seq[Block]) extends GroupLike(comments, keyword = "submitter",   name, header, blocks)
+  case class SummaryDef(      comments: Comments, name: Namespace, header: TaskHeader, blocks: Seq[Block]) extends GroupLike(comments, keyword = "summary",     name, header, blocks)
+  case class VersionerDef(    comments: Comments, name: Namespace, header: TaskHeader, blocks: Seq[Block]) extends GroupLike(comments, keyword = "versioner",   name, header, blocks)
 
 
   // TODO: use the Pimp My Library Pattern to add certain methods to certain keywords?
 
-  case class ConfigDefinition(val keyword: String,
-                         val comments: Comments,
-                         val name: Option[String],
-                         val lines: Seq[ConfigAssignment]) extends Block {
-    override def children = Seq(comments) ++ lines
-    override def toString() = {
+  case class ConfigDef(keyword: String,
+                       comments: Comments,
+                       name: Option[String],
+                       lines: Seq[ConfigAssignment]) extends Block {
+    override def children = comments +: lines
+    override def toString = {
       name match {
-        case None => ConfigDefinition.getName(this)
+        case None => ConfigDef.getName(this)
         case Some(s: String) => s
       }
     }
   }
 
-  object ConfigDefinition extends Anonymous[ConfigDefinition] {
-    def anonymousString(n:Int) = "*%s%s*".format("anonymousConfig", n)
-    def lookupName(config:ConfigDefinition) = config.name
+  object ConfigDef extends Anonymous[ConfigDef] {
+    def anonymousString(n: Int) = s"*anonymousConfig$n*"
+    def lookupName(config: ConfigDef) = config.name
   }
 
 
-  case class CrossProduct(val goals: Seq[String], val value: Seq[BranchPointRef]) extends Node {
+  case class CrossProduct(goals: Seq[String], value: Seq[BranchPointRef]) extends Node {
     override def children = value
-    override def toString() = {
-      "reach %s via %s".format(goals.mkString(","),value.mkString(" * "))
+    override def toString = {
+      s"reach ${goals.mkString(", ")} via ${value.mkString(" * ")}"
     }
   }
 
   object CrossProduct extends Anonymous[CrossProduct] {
-    def anonymousString(n:Int) = "*%s%s*".format("crossProduct", n)
-    def lookupName(plan:CrossProduct) = None
+    def anonymousString(n: Int) = s"*crossProduct$n*"
+    def lookupName(plan: CrossProduct) = None
   }
 
-  case class PlanDefinition(val comments: Comments,
-                       val name: Option[String],
-                       val crossProducts: Seq[CrossProduct]) extends Block {
-    override def children = Seq(comments) ++ crossProducts
-    override def toString() = name match {
-      case None => PlanDefinition.getName(this)
+  case class PlanDef(comments: Comments,
+                     name: Option[String],
+                     crossProducts: Seq[CrossProduct]) extends Block {
+    override def children = comments +: crossProducts
+    override def toString = name match {
+      case None => PlanDef.getName(this)
       case Some(s: String) => s
     }
   }
 
-  object PlanDefinition extends Anonymous[PlanDefinition] {
-    def anonymousString(n:Int) = "*%s%s*".format("anonymousPlan", n)
-    def lookupName(plan:PlanDefinition) = plan.name
+  object PlanDef extends Anonymous[PlanDef] {
+    def anonymousString(n: Int) = s"*anonymousPlan$n*"
+    def lookupName(plan: PlanDef) = plan.name
   }
 
   /** Ducttape hyperworkflow file. */
-  case class WorkflowDefinition(val elements: Seq[Node],
-                                val files: Seq[File], // what files is this workflow definition composed of?
-                                private val hadImports: Boolean = false,
-                                private val isImported: Boolean = false) extends Node {
+  case class WorkflowDef(elements: Seq[Node],
+                         files: Seq[File], // what files is this workflow definition composed of?
+                         private val hadImports: Boolean = false,
+                         private val isImported: Boolean = false) extends Node {
     override def children = elements
 
     lazy val blocks: Seq[Block] = elements.collect { case x: Block => x }
-
-    lazy val plans: Seq[PlanDefinition] = blocks.collect { case x: PlanDefinition => x }
-
+    lazy val plans: Seq[PlanDef] = blocks.collect { case x: PlanDef => x }
     private lazy val groupLikes: Seq[GroupLike] = blocks.collect { case x: GroupLike => x }
     lazy val versioners: Seq[VersionerDef] = groupLikes.collect { case x: VersionerDef => x } //groupLikes.filter(_.keyword == "versioner")
     lazy val submitters: Seq[SubmitterDef] = groupLikes.collect { case x: SubmitterDef => x } //groupLikes.filter(_.keyword == "submitter")
     lazy val summaries: Seq[SummaryDef] = groupLikes.collect { case x: SummaryDef => x } //groupLikes.filter(_.keyword == "summary")
 
-    private lazy val configLikes: Seq[ConfigDefinition] = blocks.collect { case x: ConfigDefinition => x }
-    lazy val configs: Seq[ConfigDefinition] = configLikes.filter { t: ConfigDefinition => t.keyword == "config"}
-    lazy val globalBlocks: Seq[ConfigDefinition] = configLikes.filter { t: ConfigDefinition => t.keyword == "global"}
+    private lazy val configLikes: Seq[ConfigDef] = blocks.collect { case x: ConfigDef => x }
+    lazy val configs: Seq[ConfigDef] = configLikes.filter { t: ConfigDef => t.keyword == "config"}
+    lazy val globalBlocks: Seq[ConfigDef] = configLikes.filter { t: ConfigDef => t.keyword == "global"}
     lazy val globals: Seq[ConfigAssignment] = globalBlocks.flatMap { _.lines }
 
     private lazy val taskLikes: Seq[TaskLike] = blocks.collect { case x: TaskLike => x }
-    lazy val tasks: Seq[TaskDef] = taskLikes.collect{ case x: TaskDef => x } //taskDefs.filter { t: TaskDef => t.keyword == "task" }
-    lazy val packages: Seq[PackageDef] = taskLikes.collect{ case x: PackageDef => x } //taskDefs.filter { t: TaskDef => t.keyword == "package" }
+    lazy val tasks: Seq[TaskDef] = taskLikes.collect { case x: TaskDef => x } //taskDefs.filter { t: TaskDef => t.keyword == "task" }
+    lazy val packages: Seq[PackageDef] = taskLikes.collect { case x: PackageDef => x } //taskDefs.filter { t: TaskDef => t.keyword == "package" }
 
     /**
      * Explicitly incorporate task definitions which were
      * created by means of function calls.
      */
-    private[syntax] def collapseFunctionCallTasks() : WorkflowDefinition = {
+    private[syntax] def collapseFunctionCallTasks(): WorkflowDef = {
 
       // Gather the list of function calls
-      val calls: Seq[CallDefinition] = blocks.collect { case x: CallDefinition => x }
+      val calls: Seq[CallDef] = blocks.collect { case x: CallDef => x }
 
       // Map from function names to function definitions
       val funcs: Map[Namespace,FuncDef] = {
@@ -490,7 +478,7 @@ object AST {
       }
 
       // Construct a list of new concrete task definitions
-      val funcTasks = calls.map { functionCall: CallDefinition =>
+      val funcTasks = calls.map { functionCall: CallDef =>
         // Use the function name to look up where that function is defined
         val functionDefinition = funcs(functionCall.functionName)
         // TODO: XXX: Lane: This is probably broken for namespaces
@@ -498,27 +486,27 @@ object AST {
         // then create a new concrete task definition
         // using the bash code from the function definition
         // and the concrete inputs and parameters from the function call
-        new TaskDef(taskName, functionDefinition, functionCall)
+        TaskDef(taskName, functionDefinition, functionCall)
       }
 
-      return new WorkflowDefinition(this.elements ++ funcTasks, this.files, this.hadImports, this.isImported)
+      WorkflowDef(this.elements ++ funcTasks, this.files, this.hadImports, this.isImported)
     }
 
-    def anonymousConfig: Option[ConfigDefinition] = configs.find(_.name == None)
+    def anonymousConfig: Option[ConfigDef] = configs.find(_.name.isEmpty)
 
     // imports will always be collapsed for the outside world
-    private lazy val imported: Seq[WorkflowDefinition] = elements.collect { case x: WorkflowDefinition => x }
-    private lazy val hasImports: Boolean = imported.size > 0
+    private lazy val imported: Seq[WorkflowDef] = elements.collect { case x: WorkflowDef => x }
+    private lazy val hasImports: Boolean = imported.nonEmpty
     lazy val usesImports: Boolean = isImported || hasImports || hadImports
-    private[syntax] def collapseImports() = new WorkflowDefinition(
+    private[syntax] def collapseImports() = WorkflowDef(
       blocks ++ imported.flatMap(_.blocks),
       files ++ imported.flatMap(_.files),
-      hadImports=this.usesImports,
-      isImported=this.isImported
+      hadImports = this.usesImports,
+      isImported = this.isImported
     )
 
-    override def toString() = blocks.mkString("\n\n")
+    override def toString = blocks.mkString("\n\n")
 
-    def ++(other: WorkflowDefinition) = new WorkflowDefinition(blocks ++ other.blocks, files ++ other.files, hadImports, isImported)
+    def ++(other: WorkflowDef) = WorkflowDef(blocks ++ other.blocks, files ++ other.files, hadImports, isImported)
   }
 }

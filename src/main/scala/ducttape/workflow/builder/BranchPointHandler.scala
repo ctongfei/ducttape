@@ -33,7 +33,7 @@ object BranchPointHandler extends Logging {
     (implicit taskTemplateBuilder: TaskTemplateBuilder)
 {
 
-    debug("Task=%s: Recursively resolving potential branch point: %s @ %s".format(taskDef, curSpec, curTask))
+    debug(s"Task=$taskDef: Recursively resolving potential branch point: $curSpec @ $curTask")
 
     implicit val state = new State(taskDef, origSpec, taskMap, isParam,
                                    prevTree, branchHistory, curTask, curSpec, prevGrafts,

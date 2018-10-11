@@ -12,7 +12,7 @@ class Namespace(val name: String, val ancestry: Option[String] = None) {
     
   override def equals(that: Any) = {
     that match { 
-      case other: Namespace => (other.toString == this.toString)
+      case other: Namespace => other.toString == this.toString
       case _                => false
     }
   }
@@ -21,7 +21,7 @@ class Namespace(val name: String, val ancestry: Option[String] = None) {
   override def hashCode() = name.hashCode ^ ancestry.hashCode
     
   /** Note: This is used by CLI globbing, so this representation must stay consistent */
-  override def toString() = ancestry match {
+  override def toString = ancestry match {
     case Some(groupNames: String) => s"${name}/${groupNames}"
     case None                     => name
   }

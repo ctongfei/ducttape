@@ -5,11 +5,4 @@ package ducttape.syntax
 import AST.Node
 
 class AbstractSyntaxTreeException(element: Node, msg: String)
-  extends RuntimeException(
-      "ERROR: line %d column %d: %s".format(
-        element.endPos.line, 
-        element.endPos.column, 
-        msg)
-      ) {
-
-}
+  extends RuntimeException(s"ERROR: line ${element.endPos.line} column ${element.endPos.column}: $msg")

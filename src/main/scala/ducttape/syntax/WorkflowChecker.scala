@@ -16,10 +16,10 @@ import ducttape.versioner.WorkflowVersionInfo
 import ducttape.syntax.AST.BranchPointDef
 import ducttape.syntax.AST.ConfigAssignment
 import ducttape.syntax.AST.Spec
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.syntax.AST.TaskDef
 import ducttape.syntax.AST.TaskLike
-import ducttape.syntax.AST.ConfigDefinition
+import ducttape.syntax.AST.ConfigDef
 import ducttape.syntax.AST.PackageDef
 import ducttape.syntax.AST.VersionerDef
 import ducttape.syntax.AST.ActionDef
@@ -33,9 +33,9 @@ import collection._
  * Checks that require access to resolved parameters could be implemented
  * in an unpacked workflow visitor.
  */
-class WorkflowChecker(workflow: WorkflowDefinition,
+class WorkflowChecker(workflow: WorkflowDef,
                       confSpecs: Seq[ConfigAssignment],
-                      builtins: Seq[WorkflowDefinition],
+                      builtins: Seq[WorkflowDef],
                       directives: Directives)
     extends Logging {
 
@@ -110,7 +110,7 @@ class WorkflowChecker(workflow: WorkflowDefinition,
     }
 
     // don't allow globals to have a name
-    for (globalBlock: ConfigDefinition <- workflow.globalBlocks) globalBlock.name match {
+    for (globalBlock: ConfigDef <- workflow.globalBlocks) globalBlock.name match {
       case None => ; // good
       case Some(name) => {
         errors += new FileFormatException("Global variable block defined at %s:%d has a name. This is not allowed.".

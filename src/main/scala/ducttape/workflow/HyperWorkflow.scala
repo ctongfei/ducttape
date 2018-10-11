@@ -14,7 +14,7 @@ import ducttape.syntax.AST.Spec
 import ducttape.syntax.AST.PackageDef
 import ducttape.syntax.AST.SubmitterDef
 import ducttape.syntax.AST.VersionerDef
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.hyperdag.HyperEdge
 import ducttape.hyperdag.UnpackedVertex
 import ducttape.hyperdag.meta.PhantomMetaHyperDag
@@ -69,7 +69,7 @@ object HyperWorkflow {
 // - not specifying a branch point indicates that any value is acceptable
 // TODO: Multimap (just use typedef?)
 class HyperWorkflow(val dag: PhantomMetaHyperDag[TaskTemplate,BranchPoint,Branch,SpecGroup],
-                    val wd: WorkflowDefinition,
+                    val wd: WorkflowDef,
                     val packageDefs: Map[Namespace,PackageDef],
                     val plans: Seq[RealizationPlan],
                     val submitters: Seq[SubmitterDef], // TODO: Resolve earlier?

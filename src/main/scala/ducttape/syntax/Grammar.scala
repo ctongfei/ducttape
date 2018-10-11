@@ -87,14 +87,7 @@ object Grammar {
       literal("*/") |
       err("Comment is missing closing */")
     )
-
-  } ^^ {
-    case list:List[String] => {
-      val sb = new StringBuilder()
-      list.foreach((item:String) => sb.append(item) )
-      sb.toString
-    }
-  }
+  } ^^ { _.mkString("") }
 
 
   val comment: Parser[String] = lineComment | blockComment
@@ -972,7 +965,7 @@ object Grammar {
   val ofBlock:       Parser[SummaryOfDef]     = taskLikeBlock(Keyword.of,             "summary",  summaryOfGenerator,     taskHeader)
   val taskBlock:     Parser[TaskDef]          = taskLikeBlock(Keyword.task,           "task",     taskBlockGenerator,     taskHeader)
 
-  val callBlock: Parser[CallDefinition] = positioned({
+  val callBlock: Parser[CallDef] = positioned({
     opt(whitespace) ~>
     comments ~
     (
@@ -989,7 +982,7 @@ object Grammar {
     )
   } ^^ {
     case (comments: Comments) ~ (name: String) ~ (functionName: String) ~ (header: TaskHeader) =>
-      new CallDefinition(comments,name,header,new Namespace(functionName))
+      new CallDef(comments,name,header,new Namespace(functionName))
   })
 
   def groupLikeBlock[A <: GroupLike](keyword: Parser[String], blockType: String, blockGenerator: ((Comments,String,TaskHeader,Seq[Block]) => A), header: Parser[TaskHeader], childBlock: Parser[Block]): Parser[A] = positioned({
@@ -1046,7 +1039,7 @@ object Grammar {
   def summaryBlock:     Parser[SummaryDef]       = groupLikeBlock(Keyword.summmary,    "summary",     summaryBlockGenerator,     taskHeader, ofBlock)
   def versionerBlock:   Parser[VersionerDef]     = groupLikeBlock(Keyword.versioner,   "versioner",   versionerBlockGenerator,   funcHeader, actionBlock)
 
-  val planBlock: Parser[PlanDefinition] = positioned({
+  val planBlock: Parser[PlanDef] = positioned({
     opt(whitespace) ~>
     comments ~
     (
@@ -1081,10 +1074,10 @@ object Grammar {
     )
   } ^^ {
     case (comments: Comments) ~ (name: Option[String]) ~ (lines: Seq[CrossProduct]) =>
-      new PlanDefinition(comments, name, lines)
+      new PlanDef(comments, name, lines)
   })
 
-  def configLikeBlock(keyword: Parser[String], blockType: String): Parser[ConfigDefinition] = positioned({
+  def configLikeBlock(keyword: Parser[String], blockType: String): Parser[ConfigDef] = positioned({
     opt(whitespace) ~>
     comments ~
     (
@@ -1121,7 +1114,7 @@ object Grammar {
     )
   } ^^ {
     case (comments: Comments) ~ (name: Option[String]) ~ (lines:Seq[ConfigAssignment]) =>
-      new ConfigDefinition(blockType,comments,name,lines)
+      new ConfigDef(blockType,comments,name,lines)
   })
 
   val configBlock = configLikeBlock(Keyword.config,"config")
@@ -1148,7 +1141,7 @@ object Grammar {
     planBlock
   }
 
-  def importStatement(importDir: File): Parser[WorkflowDefinition] = {
+  def importStatement(importDir: File): Parser[WorkflowDef] = {
     opt(whitespace) ~
     opt(comments) ~
     opt(whitespace) ~

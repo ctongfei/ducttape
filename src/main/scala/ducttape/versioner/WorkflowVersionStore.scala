@@ -6,7 +6,7 @@ import collection._
 import java.io.File
 import ducttape.exec.PackageVersioner
 import ducttape.syntax.Namespace
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.exec.DirectoryArchitect
 import ducttape.util.Files
 import ducttape.util.Environment

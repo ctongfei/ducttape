@@ -80,7 +80,7 @@ class TaskVertex(contents:TaskDef) extends TaskLikeVertex(contents) {
   override def toString() = contents.name.toString()
 }
 
-class ConfigDefinitionVertex(val contents:ConfigDefinition) extends Vertex(id=ConfigDefinition.getName(contents), contents.comments.value)
+class ConfigDefinitionVertex(val contents:ConfigDef) extends Vertex(id=ConfigDef.getName(contents), contents.comments.value)
 
 abstract sealed class SpecVertex(val contents:Spec,comment:Option[String]=None) extends Vertex(id=contents.name,comment)
 
@@ -196,4 +196,4 @@ class ShorthandBranchGraftVertex(val contents:ShorthandBranchGraft) extends Vari
 //  val branchGraftElements = contents.branchGraftElements
 //}
 
-class PlanDefinitionVertex(val contents:PlanDefinition) extends Vertex(id=contents.toString())
+class PlanDefinitionVertex(val contents:PlanDef) extends Vertex(id=contents.toString())

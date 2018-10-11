@@ -6,7 +6,7 @@ import ducttape.syntax.Namespace
 import ducttape.syntax.AST.LiteralSpec
 import ducttape.syntax.AST.Spec
 import ducttape.syntax.AST.TaskDef
-import ducttape.syntax.AST.WorkflowDefinition
+import ducttape.syntax.AST.WorkflowDef
 import ducttape.workflow.BranchFactory
 import ducttape.workflow.BranchPoint
 import ducttape.workflow.BranchPointFactory
@@ -22,10 +22,10 @@ import grizzled.slf4j.Logging
 
 // unlike WorkflowBuilder, we have no interaction with hyperdag framework here
 private[builder] class TaskTemplateBuilder(
-    wd: WorkflowDefinition,
-    private[builder] val confSpecs: Map[String,Spec],
-    private[builder] val branchPointFactory: BranchPointFactory,
-    private[builder] val branchFactory: BranchFactory) extends Logging {
+                                            wd: WorkflowDef,
+                                            private[builder] val confSpecs: Map[String,Spec],
+                                            private[builder] val branchPointFactory: BranchPointFactory,
+                                            private[builder] val branchFactory: BranchFactory) extends Logging {
 
   def findTasks(): FoundTasks = {
 

@@ -5,7 +5,7 @@ package ducttape.graph
 
 import ducttape.syntax.AST._
 
-class PackedGraph(val wd: WorkflowDefinition) extends Graph {
+class PackedGraph(val wd: WorkflowDef) extends Graph {
 
   val vertices = PackedGraph.process(wd)
 
@@ -159,7 +159,7 @@ object PackedGraph {
   }
 
 
-  def process(astNode:WorkflowDefinition) : Seq[Vertex] = {
+  def process(astNode:WorkflowDef) : Seq[Vertex] = {
     val graphFragments = new GraphFragments(astNode)
 
     addEdges(graphFragments.vertices, isTaskSpecVertex, isVariableRef)
